@@ -2,10 +2,13 @@ package com.death.likegraph;
 
 import java.util.Arrays;
 
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.widget.LoginButton;
+import com.jjoe64.graphview.GraphViewSeries;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,11 +17,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 public class MainFragment extends Fragment
 {
 	private UiLifecycleHelper uiHelper;
 	private static final String TAG = "MainFragment";
+	
+	private Button createGraph;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -36,8 +42,19 @@ public class MainFragment extends Fragment
 	    View view = inflater.inflate(R.layout.activity_main, container, false);
 
 	    LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
+	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    authButton.setFragment(this);
 	    authButton.setReadPermissions(Arrays.asList("user_status"));
+	    
+	    createGraph.setOnClickListener(new View.OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View v)
+			{
+				createGraph();
+			}
+		});
 	    
 	    return view;
 	}
@@ -101,11 +118,30 @@ public class MainFragment extends Fragment
 	    if (state.isOpened())
 	    {
 	    	Log.i(TAG, "Logged in...");
+    		createGraph.setVisibility(View.VISIBLE);
 	    }
 	    else if (state.isClosed())
 	    {
 	        Log.i(TAG, "Logged out...");
+        	createGraph.setVisibility(View.INVISIBLE);
 	    }
+	}
+	
+	private void createGraph()
+	{
+		Request req = Request.newGraphPathRequest(Session.getActiveSession(), "/me/statuses", new Request.Callback()
+		{
+			@Override
+			public void onCompleted(Response response)
+			{
+				System.out.println(response.toString());
+			}
+		});
+		Bundle params = new Bundle();
+		params.putString("limit", "5");
+		params.putString("fields", "id,likes");
+		req.setParameters(params);
+		req.executeAsync();
 	}
 	
 }
