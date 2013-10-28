@@ -1,14 +1,19 @@
 package com.death.likegraph;
 
 import java.util.Arrays;
+import java.util.HashMap;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphObject;
 import com.facebook.widget.LoginButton;
-import com.jjoe64.graphview.GraphViewSeries;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,14 +27,16 @@ import android.widget.Button;
 public class MainFragment extends Fragment
 {
 	private UiLifecycleHelper uiHelper;
+	private StatiiDatabaseAdapter statiiDatabaseAdapter;
 	private static final String TAG = "MainFragment";
 	
-	private Button createGraph;
+	private Button fetchData;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 	    super.onCreate(savedInstanceState);
+	    
 	    uiHelper = new UiLifecycleHelper(getActivity(), callback);
 	    uiHelper.onCreate(savedInstanceState);
 	}
@@ -41,18 +48,21 @@ public class MainFragment extends Fragment
 	{
 	    View view = inflater.inflate(R.layout.activity_main, container, false);
 
+	    statiiDatabaseAdapter = new StatiiDatabaseAdapter(getActivity());
+		statiiDatabaseAdapter = statiiDatabaseAdapter.open();
+	    
 	    LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
-	    createGraph = (Button) view.findViewById(R.id.createGraph);
+	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    authButton.setFragment(this);
 	    authButton.setReadPermissions(Arrays.asList("user_status"));
 	    
-	    createGraph.setOnClickListener(new View.OnClickListener()
+	    fetchData.setOnClickListener(new View.OnClickListener()
 		{
 			
 			@Override
 			public void onClick(View v)
 			{
-				createGraph();
+				while(fetchData()){}
 			}
 		});
 	    
@@ -67,8 +77,7 @@ public class MainFragment extends Fragment
 	    // session is not null, the session state change notification
 	    // may not be triggered. Trigger it if it's open/closed.
 	    Session session = Session.getActiveSession();
-	    if (session != null &&
-	           (session.isOpened() || session.isClosed()) )
+	    if (session != null && (session.isOpened() || session.isClosed()) )
 	    {
 	        onSessionStateChange(session, session.getState(), null);
 	    }
@@ -118,17 +127,19 @@ public class MainFragment extends Fragment
 	    if (state.isOpened())
 	    {
 	    	Log.i(TAG, "Logged in...");
-    		createGraph.setVisibility(View.VISIBLE);
+	    	fetchData.setVisibility(View.VISIBLE);
 	    }
 	    else if (state.isClosed())
 	    {
 	        Log.i(TAG, "Logged out...");
-        	createGraph.setVisibility(View.INVISIBLE);
+	        fetchData.setVisibility(View.INVISIBLE);
 	    }
 	}
 	
-	private void createGraph()
+	private boolean fetchData()
 	{
+		//statiiDatabaseAdapter.clearTables();
+		
 		Request req = Request.newGraphPathRequest(Session.getActiveSession(), "/me/statuses", new Request.Callback()
 		{
 			@Override
@@ -138,10 +149,11 @@ public class MainFragment extends Fragment
 			}
 		});
 		Bundle params = new Bundle();
-		params.putString("limit", "5");
-		params.putString("fields", "id,likes");
+//		params.putString("limit", "5");
+		params.putString("fields", "id,updated_time,likes");
 		req.setParameters(params);
 		req.executeAsync();
+		return false;
 	}
 	
 }

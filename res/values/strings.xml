@@ -4,6 +4,7 @@
     <string name="app_id">1376382475937382</string>
     <string name="app_name">LikeGraph</string>
     <string name="action_settings">Settings</string>
+    <string name="fetch_data">Fetch Data</string>
     <string name="create_graph">Create Graph</string>
 
 </resources>
