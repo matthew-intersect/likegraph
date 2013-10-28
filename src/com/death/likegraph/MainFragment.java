@@ -1,7 +1,7 @@
 package com.death.likegraph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +29,7 @@ public class MainFragment extends Fragment
 	private UiLifecycleHelper uiHelper;
 	private StatiiDatabaseAdapter statiiDatabaseAdapter;
 	private static final String TAG = "MainFragment";
+	int offset = 0;
 	
 	private Button fetchData;
 	
@@ -62,7 +63,8 @@ public class MainFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				while(fetchData()){}
+				fetchData();
+				rankFriends();
 			}
 		});
 	    
@@ -136,24 +138,82 @@ public class MainFragment extends Fragment
 	    }
 	}
 	
-	private boolean fetchData()
+	private void fetchData()
 	{
-		//statiiDatabaseAdapter.clearTables();
-		
+		statiiDatabaseAdapter.clearTables();
 		Request req = Request.newGraphPathRequest(Session.getActiveSession(), "/me/statuses", new Request.Callback()
 		{
 			@Override
 			public void onCompleted(Response response)
 			{
-				System.out.println(response.toString());
+				processResponse(response);
+				iterateResponse(response);
 			}
 		});
 		Bundle params = new Bundle();
-//		params.putString("limit", "5");
-		params.putString("fields", "id,updated_time,likes");
+		params.putInt("offset", offset);
+		params.putString("fields", "id,message,updated_time,likes");
 		req.setParameters(params);
-		req.executeAsync();
-		return false;
+		Request.executeBatchAsync(req);
+	}
+	
+	public void processResponse(Response response)
+	{
+		GraphObject data = response.getGraphObject();
+		JSONArray statiiData = (JSONArray) data.getProperty("data");
+		for(int i=0;i<statiiData.length();i++)
+		{
+			JSONObject item;
+			try
+			{
+				item = (JSONObject) statiiData.get(i);
+				statiiDatabaseAdapter.addStatus(item.getLong("id"), 1, item.getString("message"));
+				if(item.has("likes"))
+				{
+					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
+					JSONArray likeData = likeObject.getJSONArray("data");
+					JSONObject like;
+					for(int j=0;j<likeData.length();j++)
+					{
+						like = likeData.getJSONObject(j);
+						statiiDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+					}
+				}
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void iterateResponse(Response response)
+	{
+		Request req = Request.newGraphPathRequest(Session.getActiveSession(), "/me/statuses", new Request.Callback()
+		{
+			@Override
+			public void onCompleted(Response response)
+			{
+				processResponse(response);
+				iterateResponse(response);
+			}
+		});
+		Bundle params = new Bundle();
+		offset+=25;
+		params.putInt("offset", offset);
+		params.putString("fields", "id,message,updated_time,likes");
+		req.setParameters(params);
+		if(offset==statiiDatabaseAdapter.numberOfStatii())
+			Request.executeBatchAsync(req);
+	}
+	
+	public void rankFriends()
+	{
+		ArrayList<Friend> ranks = statiiDatabaseAdapter.getRankedLikes();
+		for(Friend f: ranks)
+		{
+			System.out.println(f.getName() + ": " + f.getCount());
+		}
 	}
 	
 }
