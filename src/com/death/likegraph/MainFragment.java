@@ -3,6 +3,8 @@ package com.death.likegraph;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -167,7 +169,10 @@ public class MainFragment extends Fragment
 			try
 			{
 				item = (JSONObject) statiiData.get(i);
-				statiiDatabaseAdapter.addStatus(item.getLong("id"), 1, item.getString("message"));
+				String postedDate = item.getString("updated_time");
+				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
+				long date = parser.parseDateTime(postedDate).getMillis();
+				statiiDatabaseAdapter.addStatus(item.getLong("id"), date, item.getString("message"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
