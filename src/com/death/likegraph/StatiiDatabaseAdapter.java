@@ -15,9 +15,10 @@ public class StatiiDatabaseAdapter
 	
 	static final String STATII_TABLE_CREATE = "create table statii" +
 	                             "( id long primary key, time long, status text); ";
+	static final String LINKS_TABLE_CREATE = "create table links" +
+            "( id long primary key, time long, message text, link text); ";
 	static final String LIKE_TABLE_CREATE = "create table likes" + 
-	                             "( id integer primary key autoincrement, name text, status_id, " +
-	                             "foreign key(status_id) references statii(id)); ";
+	                             "( id integer primary key autoincrement, name text, post_id long); ";
 	public SQLiteDatabase db;
 	private final Context context;
 	private DatabaseHelper dbHelper;
@@ -54,11 +55,22 @@ public class StatiiDatabaseAdapter
 		db.insert("statii", null, newValues);
 	}
 	
+	public void addLink(long id, long time, String message, String link)
+	{
+		ContentValues newValues = new ContentValues();
+		newValues.put("id", id);
+		newValues.put("time", time);
+		newValues.put("message", message);
+		newValues.put("link", link);
+	
+		db.insert("links", null, newValues);
+	}
+	
 	public void addLike(String name, long status)
 	{
 		ContentValues newValues = new ContentValues();
 		newValues.put("name", name);
-		newValues.put("status_id", status);
+		newValues.put("post_id", status);
 	
 		db.insert("likes", null, newValues);
 	}
@@ -67,10 +79,13 @@ public class StatiiDatabaseAdapter
 	{
 		db.execSQL("DROP TABLE IF EXISTS statii");
 		db.execSQL("DROP TABLE IF EXISTS likes");
+		db.execSQL("DROP TABLE IF EXISTS links");
 		db.execSQL(StatiiDatabaseAdapter.STATII_TABLE_CREATE);
 		db.execSQL(StatiiDatabaseAdapter.LIKE_TABLE_CREATE);
+		db.execSQL(StatiiDatabaseAdapter.LINKS_TABLE_CREATE);
 		db.execSQL("delete from statii");
 		db.execSQL("delete from likes");
+		db.execSQL("delete from links");
 	}
 	
 	public ArrayList<Friend> getRankedLikes()
@@ -88,9 +103,14 @@ public class StatiiDatabaseAdapter
 		return ranks;
 	}
 	
-	public int numberOfStatii()
+	public int getNumberOfStatii()
 	{
 		return db.query("statii", null, null, null, null, null, null).getCount();
+	}
+	
+	public int getNumberOfLinks()
+	{
+		return db.query("links", null, null, null, null, null, null).getCount();
 	}
 			
 }
