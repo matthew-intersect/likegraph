@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.facebook.Request;
+import com.facebook.RequestBatch;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -17,7 +18,9 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphObject;
 import com.facebook.widget.LoginButton;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -33,7 +36,8 @@ public class MainFragment extends Fragment
 	private static final String TAG = "MainFragment";
 	int offset = 0;
 	
-	private Button fetchData;
+	private ProgressDialog dialog;
+	private Button fetchData, createGraph;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -56,6 +60,7 @@ public class MainFragment extends Fragment
 	    
 	    LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
+	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    authButton.setFragment(this);
 	    authButton.setReadPermissions(Arrays.asList("user_status"));
 	    
@@ -65,8 +70,15 @@ public class MainFragment extends Fragment
 			@Override
 			public void onClick(View v)
 			{
-				fetchData();
-				rankFriends();
+//				AsyncTask fetch = new FetchDataTask(getActivity()).execute();
+				dialog = new ProgressDialog(getActivity());
+				dialog.setMessage("Fetching data...");
+		        dialog.show();
+		        statiiDatabaseAdapter.clearTables();
+		        batchStatiiRequest();
+				//fetchStatiiData();
+//				dialog.dismiss();
+//				rankFriends();
 			}
 		});
 	    
@@ -140,7 +152,7 @@ public class MainFragment extends Fragment
 	    }
 	}
 	
-	private void fetchData()
+	private void fetchStatiiData()
 	{
 		statiiDatabaseAdapter.clearTables();
 		Request req = Request.newGraphPathRequest(Session.getActiveSession(), "/me/statuses", new Request.Callback()
@@ -148,8 +160,8 @@ public class MainFragment extends Fragment
 			@Override
 			public void onCompleted(Response response)
 			{
-				processResponse(response);
-				iterateResponse(response);
+				processStatiiResponse(response);
+				iterateStatiiResponse(response);
 			}
 		});
 		Bundle params = new Bundle();
@@ -159,7 +171,7 @@ public class MainFragment extends Fragment
 		Request.executeBatchAsync(req);
 	}
 	
-	public void processResponse(Response response)
+	public void processStatiiResponse(Response response)
 	{
 		GraphObject data = response.getGraphObject();
 		JSONArray statiiData = (JSONArray) data.getProperty("data");
@@ -192,15 +204,15 @@ public class MainFragment extends Fragment
 		}
 	}
 	
-	public void iterateResponse(Response response)
+	public void iterateStatiiResponse(Response response)
 	{
 		Request req = Request.newGraphPathRequest(Session.getActiveSession(), "/me/statuses", new Request.Callback()
 		{
 			@Override
 			public void onCompleted(Response response)
 			{
-				processResponse(response);
-				iterateResponse(response);
+				processStatiiResponse(response);
+				iterateStatiiResponse(response);
 			}
 		});
 		Bundle params = new Bundle();
@@ -210,6 +222,47 @@ public class MainFragment extends Fragment
 		req.setParameters(params);
 		if(offset==statiiDatabaseAdapter.numberOfStatii())
 			Request.executeBatchAsync(req);
+	}
+	
+	public void batchStatiiRequest()
+	{
+		RequestBatch requestBatch = new RequestBatch();
+		for(int i=0;i<10;i++)
+		{
+			Request req = new Request(Session.getActiveSession(), "/me/statuses", null, null, new Request.Callback()
+			{
+	            public void onCompleted(Response response)
+	            {
+	            	processStatiiResponse(response);
+	            }
+	        });
+			Bundle params = new Bundle();
+			params.putInt("offset", offset);
+			offset+=25;
+			params.putString("fields", "id,message,updated_time,likes");
+			req.setParameters(params);
+			requestBatch.add(req);
+		}
+		requestBatch.addCallback(new RequestBatch.Callback()
+		{
+			@Override
+			public void onBatchCompleted(RequestBatch batch)
+			{
+				if(statiiDatabaseAdapter.numberOfStatii()==offset)
+				{
+					System.out.println("again");
+					batchStatiiRequest();
+				}
+				else
+				{
+					System.out.println("stop");
+					offset = 0;
+//					batchLinksRequest();
+				}
+				dialog.dismiss();
+			}
+		});
+		requestBatch.executeAsync();
 	}
 	
 	public void rankFriends()
