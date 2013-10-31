@@ -61,7 +61,7 @@ public class MainFragment extends Fragment
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    authButton.setFragment(this);
-	    authButton.setReadPermissions(Arrays.asList("read_stream"));
+	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins"));
 	    
 	    fetchData.setOnClickListener(new View.OnClickListener()
 		{
@@ -149,6 +149,127 @@ public class MainFragment extends Fragment
 	    }
 	}
 	
+	public void batchStatiiRequest()
+	{
+		dialog.setMessage("Fetching statuses...");
+		RequestBatch requestBatch = new RequestBatch();
+		for(int i=0;i<10;i++)
+		{
+			Request req = new Request(Session.getActiveSession(), "/me/statuses", null, null, new Request.Callback()
+			{
+				public void onCompleted(Response response)
+				{
+					processStatiiResponse(response);
+				}
+			});
+			Bundle params = new Bundle();
+			params.putInt("limit", 25);
+			params.putInt("offset", offset);
+			offset+=25;
+			params.putString("fields", "id,message,updated_time,likes");
+			req.setParameters(params);
+			requestBatch.add(req);
+		}
+		requestBatch.addCallback(new RequestBatch.Callback()
+		{
+			@Override
+			public void onBatchCompleted(RequestBatch batch)
+			{
+				if(statiiDatabaseAdapter.getNumberOfStatii()==offset)
+				{
+					batchStatiiRequest();
+				}
+				else
+				{
+					offset = 0;
+					batchLinksRequest();
+				}
+			}
+		});
+		requestBatch.executeAsync();
+	}
+	
+	public void batchLinksRequest()
+	{
+		dialog.setMessage("Fetching links...");
+		RequestBatch requestBatch = new RequestBatch();
+		for(int i=0;i<10;i++)
+		{
+			Request req = new Request(Session.getActiveSession(), "/me/links", null, null, new Request.Callback()
+			{
+				public void onCompleted(Response response)
+				{
+					processLinksResponse(response);
+				}
+			});
+			Bundle params = new Bundle();
+			params.putInt("limit", 25);
+			params.putInt("offset", offset);
+			offset+=25;
+			params.putString("fields", "id,message,created_time,likes,link");
+			req.setParameters(params);
+			requestBatch.add(req);
+		}
+		requestBatch.addCallback(new RequestBatch.Callback()
+		{
+			@Override
+			public void onBatchCompleted(RequestBatch batch)
+			{
+				if(statiiDatabaseAdapter.getNumberOfLinks()==offset)
+				{
+					batchLinksRequest();
+				}
+				else
+				{
+					offset = 0;
+					batchCheckinsRequest();
+				}
+			}
+		});
+		requestBatch.executeAsync();
+	}
+	
+	public void batchCheckinsRequest()
+	{
+		dialog.setMessage("Fetching checkins...");
+		RequestBatch requestBatch = new RequestBatch();
+		for(int i=0;i<10;i++)
+		{
+			Request req = new Request(Session.getActiveSession(), "/me/checkins", null, null, new Request.Callback()
+			{
+				public void onCompleted(Response response)
+				{
+					processCheckinsResponse(response);
+				}
+			});
+			Bundle params = new Bundle();
+			params.putInt("limit", 25);
+			params.putInt("offset", offset);
+			offset+=25;
+			params.putString("fields", "id,message,created_time,likes,place,from");
+			req.setParameters(params);
+			requestBatch.add(req);
+		}
+		requestBatch.addCallback(new RequestBatch.Callback()
+		{
+			@Override
+			public void onBatchCompleted(RequestBatch batch)
+			{
+				if(statiiDatabaseAdapter.getNumberOfCheckins()==offset)
+				{
+					batchCheckinsRequest();
+				}
+				else
+				{
+					offset = 0;
+//					batchPhotosRequest();
+				}
+				dialog.dismiss();
+			}
+		});
+		requestBatch.executeAsync();
+	}
+	
 	public void processStatiiResponse(Response response)
 	{
 		GraphObject data = response.getGraphObject();
@@ -216,83 +337,40 @@ public class MainFragment extends Fragment
 		}
 	}
 	
-	public void batchStatiiRequest()
+	public void processCheckinsResponse(Response response)
 	{
-		RequestBatch requestBatch = new RequestBatch();
-		for(int i=0;i<10;i++)
+		GraphObject data = response.getGraphObject();
+		JSONArray checkinsData = (JSONArray) data.getProperty("data");
+		for(int i=0;i<checkinsData.length();i++)
 		{
-			Request req = new Request(Session.getActiveSession(), "/me/statuses", null, null, new Request.Callback()
+			JSONObject item;
+			try
 			{
-	            public void onCompleted(Response response)
-	            {
-	            	processStatiiResponse(response);
-	            }
-	        });
-			Bundle params = new Bundle();
-			params.putInt("limit", 25);
-			params.putInt("offset", offset);
-			offset+=25;
-			params.putString("fields", "id,message,updated_time,likes");
-			req.setParameters(params);
-			requestBatch.add(req);
-		}
-		requestBatch.addCallback(new RequestBatch.Callback()
-		{
-			@Override
-			public void onBatchCompleted(RequestBatch batch)
-			{
-				if(statiiDatabaseAdapter.getNumberOfStatii()==offset)
+				item = (JSONObject) checkinsData.get(i);
+				JSONObject from = (JSONObject) item.getJSONObject("from");
+				JSONObject place = (JSONObject) item.getJSONObject("place");
+				String postedDate = item.getString("created_time");
+				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
+				long date = parser.parseDateTime(postedDate).getMillis();
+				String message = (item.has("message")) ? item.getString("message") : "";
+				statiiDatabaseAdapter.addCheckin(item.getLong("id"), date, from.getString("name"), message, place.getString("name"));
+				if(item.has("likes"))
 				{
-					batchStatiiRequest();
-				}
-				else
-				{
-					offset = 0;
-					batchLinksRequest();
+					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
+					JSONArray likeData = likeObject.getJSONArray("data");
+					JSONObject like;
+					for(int j=0;j<likeData.length();j++)
+					{
+						like = likeData.getJSONObject(j);
+						statiiDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+					}
 				}
 			}
-		});
-		requestBatch.executeAsync();
-	}
-	
-	public void batchLinksRequest()
-	{
-		RequestBatch requestBatch = new RequestBatch();
-		for(int i=0;i<10;i++)
-		{
-			Request req = new Request(Session.getActiveSession(), "/me/links", null, null, new Request.Callback()
+			catch (JSONException e)
 			{
-	            public void onCompleted(Response response)
-	            {
-	            	processLinksResponse(response);
-	            }
-	        });
-			Bundle params = new Bundle();
-			params.putInt("limit", 25);
-			params.putInt("offset", offset);
-			offset+=25;
-			params.putString("fields", "id,message,created_time,likes,link");
-			req.setParameters(params);
-			requestBatch.add(req);
-		}
-		requestBatch.addCallback(new RequestBatch.Callback()
-		{
-			@Override
-			public void onBatchCompleted(RequestBatch batch)
-			{
-				if(statiiDatabaseAdapter.getNumberOfLinks()==offset)
-				{
-					batchStatiiRequest();
-				}
-				else
-				{
-					offset = 0;
-//					batchCheckinsRequest();
-				}
-				dialog.dismiss();
+				e.printStackTrace();
 			}
-		});
-		requestBatch.executeAsync();
+		}
 	}
 	
 	public void rankFriends()

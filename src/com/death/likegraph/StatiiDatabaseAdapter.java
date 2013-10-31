@@ -17,6 +17,8 @@ public class StatiiDatabaseAdapter
 	                             "( id long primary key, time long, status text); ";
 	static final String LINKS_TABLE_CREATE = "create table links" +
             "( id long primary key, time long, message text, link text); ";
+	static final String CHECKINS_TABLE_CREATE = "create table checkins" +
+            "( id long primary key, time long, poster text, message text, location text); ";
 	static final String LIKE_TABLE_CREATE = "create table likes" + 
 	                             "( id integer primary key autoincrement, name text, post_id long); ";
 	public SQLiteDatabase db;
@@ -66,6 +68,18 @@ public class StatiiDatabaseAdapter
 		db.insert("links", null, newValues);
 	}
 	
+	public void addCheckin(long id, long time, String from, String message, String location)
+	{
+		ContentValues newValues = new ContentValues();
+		newValues.put("id", id);
+		newValues.put("time", time);
+		newValues.put("message", message);
+		newValues.put("location", location);
+		newValues.put("poster", from);
+	
+		db.insert("checkins", null, newValues);
+	}
+	
 	public void addLike(String name, long status)
 	{
 		ContentValues newValues = new ContentValues();
@@ -80,12 +94,15 @@ public class StatiiDatabaseAdapter
 		db.execSQL("DROP TABLE IF EXISTS statii");
 		db.execSQL("DROP TABLE IF EXISTS likes");
 		db.execSQL("DROP TABLE IF EXISTS links");
+		db.execSQL("DROP TABLE IF EXISTS checkins");
 		db.execSQL(StatiiDatabaseAdapter.STATII_TABLE_CREATE);
 		db.execSQL(StatiiDatabaseAdapter.LIKE_TABLE_CREATE);
 		db.execSQL(StatiiDatabaseAdapter.LINKS_TABLE_CREATE);
+		db.execSQL(StatiiDatabaseAdapter.CHECKINS_TABLE_CREATE);
 		db.execSQL("delete from statii");
 		db.execSQL("delete from likes");
 		db.execSQL("delete from links");
+		db.execSQL("delete from checkins");
 	}
 	
 	public ArrayList<Friend> getRankedLikes()
@@ -111,6 +128,11 @@ public class StatiiDatabaseAdapter
 	public int getNumberOfLinks()
 	{
 		return db.query("links", null, null, null, null, null, null).getCount();
+	}
+	
+	public int getNumberOfCheckins()
+	{
+		return db.query("checkins", null, null, null, null, null, null).getCount();
 	}
 			
 }

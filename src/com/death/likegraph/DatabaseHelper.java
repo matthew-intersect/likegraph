@@ -20,6 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 			db.execSQL(StatiiDatabaseAdapter.STATII_TABLE_CREATE);
 			db.execSQL(StatiiDatabaseAdapter.LIKE_TABLE_CREATE);
 			db.execSQL(StatiiDatabaseAdapter.LINKS_TABLE_CREATE);
+			db.execSQL(StatiiDatabaseAdapter.CHECKINS_TABLE_CREATE);
 	}
 	
 	@Override
@@ -30,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 			_db.execSQL("DROP TABLE IF EXISTS statii");
 			_db.execSQL("DROP TABLE IF EXISTS likes");
 			_db.execSQL("DROP TABLE IF EXISTS links");
+			_db.execSQL("DROP TABLE IF EXISTS checkins");
 			onCreate(_db);
 	}
 
