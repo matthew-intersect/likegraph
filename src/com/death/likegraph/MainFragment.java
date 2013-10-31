@@ -31,7 +31,7 @@ import android.widget.Button;
 public class MainFragment extends Fragment
 {
 	private UiLifecycleHelper uiHelper;
-	private StatiiDatabaseAdapter statiiDatabaseAdapter;
+	private PostsDatabaseAdapter postsDatabaseAdapter;
 	private static final String TAG = "MainFragment";
 	int offset = 0;
 	
@@ -54,8 +54,8 @@ public class MainFragment extends Fragment
 	{
 	    View view = inflater.inflate(R.layout.activity_main, container, false);
 
-	    statiiDatabaseAdapter = new StatiiDatabaseAdapter(getActivity());
-		statiiDatabaseAdapter = statiiDatabaseAdapter.open();
+	    postsDatabaseAdapter = new PostsDatabaseAdapter(getActivity());
+	    postsDatabaseAdapter = postsDatabaseAdapter.open();
 	    
 	    LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
@@ -72,7 +72,7 @@ public class MainFragment extends Fragment
 				dialog = new ProgressDialog(getActivity());
 				dialog.setMessage("Fetching data...");
 		        dialog.show();
-		        statiiDatabaseAdapter.clearTables();
+		        postsDatabaseAdapter.clearTables();
 		        batchStatiiRequest();
 			}
 		});
@@ -175,7 +175,7 @@ public class MainFragment extends Fragment
 			@Override
 			public void onBatchCompleted(RequestBatch batch)
 			{
-				if(statiiDatabaseAdapter.getNumberOfStatii()==offset)
+				if(postsDatabaseAdapter.getNumberOfStatii()==offset)
 				{
 					batchStatiiRequest();
 				}
@@ -215,7 +215,7 @@ public class MainFragment extends Fragment
 			@Override
 			public void onBatchCompleted(RequestBatch batch)
 			{
-				if(statiiDatabaseAdapter.getNumberOfLinks()==offset)
+				if(postsDatabaseAdapter.getNumberOfLinks()==offset)
 				{
 					batchLinksRequest();
 				}
@@ -255,7 +255,7 @@ public class MainFragment extends Fragment
 			@Override
 			public void onBatchCompleted(RequestBatch batch)
 			{
-				if(statiiDatabaseAdapter.getNumberOfCheckins()==offset)
+				if(postsDatabaseAdapter.getNumberOfCheckins()==offset)
 				{
 					batchCheckinsRequest();
 				}
@@ -283,7 +283,7 @@ public class MainFragment extends Fragment
 				String postedDate = item.getString("updated_time");
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
-				statiiDatabaseAdapter.addStatus(item.getLong("id"), date, item.getString("message"));
+				postsDatabaseAdapter.addStatus(item.getLong("id"), date, item.getString("message"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -292,7 +292,7 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						statiiDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
 					}
 				}
 			}
@@ -317,7 +317,7 @@ public class MainFragment extends Fragment
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("message")) ? item.getString("message") : "";
-				statiiDatabaseAdapter.addLink(item.getLong("id"), date, message, item.getString("link"));
+				postsDatabaseAdapter.addLink(item.getLong("id"), date, message, item.getString("link"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -326,7 +326,7 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						statiiDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
 					}
 				}
 			}
@@ -353,7 +353,7 @@ public class MainFragment extends Fragment
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("message")) ? item.getString("message") : "";
-				statiiDatabaseAdapter.addCheckin(item.getLong("id"), date, from.getString("name"), message, place.getString("name"));
+				postsDatabaseAdapter.addCheckin(item.getLong("id"), date, from.getString("name"), message, place.getString("name"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -362,7 +362,7 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						statiiDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
 					}
 				}
 			}
@@ -375,7 +375,7 @@ public class MainFragment extends Fragment
 	
 	public void rankFriends()
 	{
-		ArrayList<Friend> ranks = statiiDatabaseAdapter.getRankedLikes();
+		ArrayList<Friend> ranks = postsDatabaseAdapter.getRankedLikes();
 		for(Friend f: ranks)
 		{
 			System.out.println(f.getName() + ": " + f.getCount());

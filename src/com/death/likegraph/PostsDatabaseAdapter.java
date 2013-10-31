@@ -8,7 +8,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-public class StatiiDatabaseAdapter 
+public class PostsDatabaseAdapter 
 {
 	static final String DATABASE_NAME = "likegraph.db";
 	static final int DATABASE_VERSION = 1;
@@ -25,13 +25,13 @@ public class StatiiDatabaseAdapter
 	private final Context context;
 	private DatabaseHelper dbHelper;
 	
-	public StatiiDatabaseAdapter(Context _context) 
+	public PostsDatabaseAdapter(Context _context) 
 	{
 		context = _context;
 		dbHelper = new DatabaseHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 	
-	public StatiiDatabaseAdapter open() throws SQLException 
+	public PostsDatabaseAdapter open() throws SQLException 
 	{
 		db = dbHelper.getWritableDatabase();
 		return this;
@@ -95,10 +95,10 @@ public class StatiiDatabaseAdapter
 		db.execSQL("DROP TABLE IF EXISTS likes");
 		db.execSQL("DROP TABLE IF EXISTS links");
 		db.execSQL("DROP TABLE IF EXISTS checkins");
-		db.execSQL(StatiiDatabaseAdapter.STATII_TABLE_CREATE);
-		db.execSQL(StatiiDatabaseAdapter.LIKE_TABLE_CREATE);
-		db.execSQL(StatiiDatabaseAdapter.LINKS_TABLE_CREATE);
-		db.execSQL(StatiiDatabaseAdapter.CHECKINS_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.STATII_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.LIKE_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.LINKS_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.CHECKINS_TABLE_CREATE);
 		db.execSQL("delete from statii");
 		db.execSQL("delete from likes");
 		db.execSQL("delete from links");

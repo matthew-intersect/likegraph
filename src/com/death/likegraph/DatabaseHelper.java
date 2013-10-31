@@ -17,10 +17,10 @@ public class DatabaseHelper extends SQLiteOpenHelper
 	@Override
 	public void onCreate(SQLiteDatabase db)
 	{
-			db.execSQL(StatiiDatabaseAdapter.STATII_TABLE_CREATE);
-			db.execSQL(StatiiDatabaseAdapter.LIKE_TABLE_CREATE);
-			db.execSQL(StatiiDatabaseAdapter.LINKS_TABLE_CREATE);
-			db.execSQL(StatiiDatabaseAdapter.CHECKINS_TABLE_CREATE);
+			db.execSQL(PostsDatabaseAdapter.STATII_TABLE_CREATE);
+			db.execSQL(PostsDatabaseAdapter.LIKE_TABLE_CREATE);
+			db.execSQL(PostsDatabaseAdapter.LINKS_TABLE_CREATE);
+			db.execSQL(PostsDatabaseAdapter.CHECKINS_TABLE_CREATE);
 	}
 	
 	@Override
