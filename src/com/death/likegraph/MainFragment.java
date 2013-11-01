@@ -373,7 +373,7 @@ public class MainFragment extends Fragment
 				String postedDate = item.getString("updated_time");
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
-				postsDatabaseAdapter.addStatus(item.getLong("id"), date, item.getString("message"));
+				postsDatabaseAdapter.addStatus(Long.parseLong(item.getString("id")), date, item.getString("message"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -382,7 +382,13 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), Long.parseLong(item.getString("id")));
+					}
+					JSONObject paging = (JSONObject) likeObject.getJSONObject("paging");
+					if(paging.has("next"))
+					{
+						JSONObject cursors = paging.getJSONObject("cursors");
+						makeLikeRequest(Long.parseLong(item.getString("id")), cursors.getString("after"));
 					}
 				}
 			}
@@ -407,7 +413,7 @@ public class MainFragment extends Fragment
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("message")) ? item.getString("message") : "";
-				postsDatabaseAdapter.addLink(item.getLong("id"), date, message, item.getString("link"));
+				postsDatabaseAdapter.addLink(Long.parseLong(item.getString("id")), date, message, item.getString("link"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -416,7 +422,13 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), Long.parseLong(item.getString("id")));
+					}
+					JSONObject paging = (JSONObject) likeObject.getJSONObject("paging");
+					if(paging.has("next"))
+					{
+						JSONObject cursors = paging.getJSONObject("cursors");
+						makeLikeRequest(Long.parseLong(item.getString("id")), cursors.getString("after"));
 					}
 				}
 			}
@@ -443,7 +455,7 @@ public class MainFragment extends Fragment
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("message")) ? item.getString("message") : "";
-				postsDatabaseAdapter.addCheckin(item.getLong("id"), date, from.getString("name"), message, place.getString("name"));
+				postsDatabaseAdapter.addCheckin(Long.parseLong(item.getString("id")), date, from.getString("name"), message, place.getString("name"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -452,7 +464,13 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), Long.parseLong(item.getString("id")));
+					}
+					JSONObject paging = (JSONObject) likeObject.getJSONObject("paging");
+					if(paging.has("next"))
+					{
+						JSONObject cursors = paging.getJSONObject("cursors");
+						makeLikeRequest(Long.parseLong(item.getString("id")), cursors.getString("after"));
 					}
 				}
 			}
@@ -478,7 +496,7 @@ public class MainFragment extends Fragment
 				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("name")) ? item.getString("name") : "";
-				postsDatabaseAdapter.addPhoto(item.getLong("id"), date, from.getString("name"), message, item.getString("source"));
+				postsDatabaseAdapter.addPhoto(Long.parseLong(item.getString("id")), date, from.getString("name"), message, item.getString("source"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -487,7 +505,13 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), Long.parseLong(item.getString("id")));
+					}
+					JSONObject paging = (JSONObject) likeObject.getJSONObject("paging");
+					if(paging.has("next"))
+					{
+						JSONObject cursors = paging.getJSONObject("cursors");
+						makeLikeRequest(Long.parseLong(item.getString("id")), cursors.getString("after"));
 					}
 				}
 			}
@@ -514,7 +538,7 @@ public class MainFragment extends Fragment
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("name")) ? item.getString("name") : "";
 				String description = (item.has("description")) ? item.getString("description") : "";
-				postsDatabaseAdapter.addVideo(item.getLong("id"), date, from.getString("name"), message, description, item.getString("source"));
+				postsDatabaseAdapter.addVideo(Long.parseLong(item.getString("id")), date, from.getString("name"), message, description, item.getString("source"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
@@ -523,7 +547,13 @@ public class MainFragment extends Fragment
 					for(int j=0;j<likeData.length();j++)
 					{
 						like = likeData.getJSONObject(j);
-						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+						postsDatabaseAdapter.addLike(like.getString("name"), Long.parseLong(item.getString("id")));
+					}
+					JSONObject paging = (JSONObject) likeObject.getJSONObject("paging");
+					if(paging.has("next"))
+					{
+						JSONObject cursors = paging.getJSONObject("cursors");
+						makeLikeRequest(Long.parseLong(item.getString("id")), cursors.getString("after"));
 					}
 				}
 			}
@@ -532,6 +562,42 @@ public class MainFragment extends Fragment
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void makeLikeRequest(final long id, String next)
+	{
+		Request req = new Request(Session.getActiveSession(), "/"+String.valueOf(id)+"/likes", null, null, new Request.Callback()
+		{
+			public void onCompleted(Response response)
+			{
+				GraphObject data = response.getGraphObject();
+				JSONArray likeData = (JSONArray) data.getProperty("data");
+				JSONObject like;
+				try
+				{
+					for(int j=0;j<likeData.length();j++)
+					{
+							like = likeData.getJSONObject(j);
+							postsDatabaseAdapter.addLike(like.getString("name"), id);
+					}
+					JSONObject paging = (JSONObject) data.getProperty("paging");
+					if(paging.has("next"))
+					{
+						JSONObject cursors = paging.getJSONObject("cursors");
+						makeLikeRequest(id, cursors.getString("after"));
+					}
+				}
+				catch (JSONException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		});
+		Bundle params = new Bundle();
+		params.putInt("limit", 25);
+		params.putString("after", next);
+		req.setParameters(params);
+		req.executeAsync();
 	}
 	
 	public void rankFriends()
