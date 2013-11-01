@@ -61,7 +61,7 @@ public class MainFragment extends Fragment
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    authButton.setFragment(this);
-	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins", "user_photos"));
+	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins", "user_photos", "user_videos"));
 	    
 	    fetchData.setOnClickListener(new View.OnClickListener()
 		{
@@ -264,7 +264,6 @@ public class MainFragment extends Fragment
 					offset = 0;
 					batchPhotosRequest();
 				}
-				dialog.dismiss();
 			}
 		});
 		requestBatch.executeAsync();
@@ -304,9 +303,49 @@ public class MainFragment extends Fragment
 				else
 				{
 					offset = 0;
-//					batchVideosRequest();
+					batchVideosRequest();
 				}
-				dialog.dismiss();
+			}
+		});
+		requestBatch.executeAsync();
+	}
+	
+	public void batchVideosRequest()
+	{
+		dialog.setMessage("Fetching videos...");
+		RequestBatch requestBatch = new RequestBatch();
+		for(int i=0;i<10;i++)
+		{
+			Request req = new Request(Session.getActiveSession(), "/me/videos", null, null, new Request.Callback()
+			{
+				public void onCompleted(Response response)
+				{
+					processVideosResponse(response);
+				}
+			});
+			Bundle params = new Bundle();
+			params.putString("type", "uploaded");
+			params.putInt("limit", 25);
+			params.putInt("offset", offset);
+			offset+=25;
+			params.putString("fields", "id,name,created_time,likes,source,from,description");
+			req.setParameters(params);
+			requestBatch.add(req);
+		}
+		requestBatch.addCallback(new RequestBatch.Callback()
+		{
+			@Override
+			public void onBatchCompleted(RequestBatch batch)
+			{
+				if(postsDatabaseAdapter.getNumberOfVideos()==offset)
+				{
+					batchVideosRequest();
+				}
+				else
+				{
+					offset = 0;
+					dialog.dismiss();
+				}
 			}
 		});
 		requestBatch.executeAsync();
@@ -431,6 +470,42 @@ public class MainFragment extends Fragment
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("name")) ? item.getString("name") : "";
 				postsDatabaseAdapter.addPhoto(item.getLong("id"), date, from.getString("name"), message, item.getString("source"));
+				if(item.has("likes"))
+				{
+					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
+					JSONArray likeData = likeObject.getJSONArray("data");
+					JSONObject like;
+					for(int j=0;j<likeData.length();j++)
+					{
+						like = likeData.getJSONObject(j);
+						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+					}
+				}
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void processVideosResponse(Response response)
+	{
+		GraphObject data = response.getGraphObject();
+		JSONArray videosData = (JSONArray) data.getProperty("data");
+		for(int i=0;i<videosData.length();i++)
+		{
+			JSONObject item;
+			try
+			{
+				item = (JSONObject) videosData.get(i);
+				JSONObject from = (JSONObject) item.getJSONObject("from");
+				String postedDate = item.getString("created_time");
+				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
+				long date = parser.parseDateTime(postedDate).getMillis();
+				String message = (item.has("name")) ? item.getString("name") : "";
+				String description = (item.has("description")) ? item.getString("description") : "";
+				postsDatabaseAdapter.addVideo(item.getLong("id"), date, from.getString("name"), message, description, item.getString("source"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");

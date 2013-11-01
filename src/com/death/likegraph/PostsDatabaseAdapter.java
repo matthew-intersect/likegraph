@@ -21,6 +21,8 @@ public class PostsDatabaseAdapter
             "( id long primary key, time long, poster text, message text, location text); ";
 	static final String PHOTOS_TABLE_CREATE = "create table photos" + 
 			"( id long primary key, time long, poster text, message text, source text); ";
+	static final String VIDEOS_TABLE_CREATE = "create table videos" + 
+			"( id long primary key, time long, poster text, name text, description text, source text); ";
 	static final String LIKE_TABLE_CREATE = "create table likes" + 
 	                             "( id integer primary key autoincrement, name text, post_id long); ";
 	public SQLiteDatabase db;
@@ -94,6 +96,19 @@ public class PostsDatabaseAdapter
 		db.insert("photos", null, newValues);
 	}
 	
+	public void addVideo(long id, long time, String from, String name, String description, String source)
+	{
+		ContentValues newValues = new ContentValues();
+		newValues.put("id", id);
+		newValues.put("time", time);
+		newValues.put("name", name);
+		newValues.put("description", description);
+		newValues.put("source", source);
+		newValues.put("poster", from);
+	
+		db.insert("videos", null, newValues);
+	}
+	
 	public void addLike(String name, long status)
 	{
 		ContentValues newValues = new ContentValues();
@@ -110,16 +125,19 @@ public class PostsDatabaseAdapter
 		db.execSQL("DROP TABLE IF EXISTS links");
 		db.execSQL("DROP TABLE IF EXISTS checkins");
 		db.execSQL("DROP TABLE IF EXISTS photos");
+		db.execSQL("DROP TABLE IF EXISTS videos");
 		db.execSQL(PostsDatabaseAdapter.STATII_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.LIKE_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.LINKS_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.CHECKINS_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.PHOTOS_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.VIDEOS_TABLE_CREATE);
 		db.execSQL("delete from statii");
 		db.execSQL("delete from likes");
 		db.execSQL("delete from links");
 		db.execSQL("delete from checkins");
 		db.execSQL("delete from photos");
+		db.execSQL("delete from videos");
 	}
 	
 	public ArrayList<Friend> getRankedLikes()
@@ -155,5 +173,10 @@ public class PostsDatabaseAdapter
 	public int getNumberOfPhotos()
 	{
 		return db.query("photos", null, null, null, null, null, null).getCount();
+	}
+	
+	public int getNumberOfVideos()
+	{
+		return db.query("videos", null, null, null, null, null, null).getCount();
 	}
 }
