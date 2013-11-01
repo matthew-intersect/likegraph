@@ -21,6 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 			db.execSQL(PostsDatabaseAdapter.LIKE_TABLE_CREATE);
 			db.execSQL(PostsDatabaseAdapter.LINKS_TABLE_CREATE);
 			db.execSQL(PostsDatabaseAdapter.CHECKINS_TABLE_CREATE);
+			db.execSQL(PostsDatabaseAdapter.PHOTOS_TABLE_CREATE);
 	}
 	
 	@Override
@@ -32,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
 			_db.execSQL("DROP TABLE IF EXISTS likes");
 			_db.execSQL("DROP TABLE IF EXISTS links");
 			_db.execSQL("DROP TABLE IF EXISTS checkins");
+			_db.execSQL("DROP TABLE IF EXISTS photos");
 			onCreate(_db);
 	}
 

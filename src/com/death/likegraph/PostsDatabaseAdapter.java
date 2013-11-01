@@ -19,6 +19,8 @@ public class PostsDatabaseAdapter
             "( id long primary key, time long, message text, link text); ";
 	static final String CHECKINS_TABLE_CREATE = "create table checkins" +
             "( id long primary key, time long, poster text, message text, location text); ";
+	static final String PHOTOS_TABLE_CREATE = "create table photos" + 
+			"( id long primary key, time long, poster text, message text, source text); ";
 	static final String LIKE_TABLE_CREATE = "create table likes" + 
 	                             "( id integer primary key autoincrement, name text, post_id long); ";
 	public SQLiteDatabase db;
@@ -80,6 +82,18 @@ public class PostsDatabaseAdapter
 		db.insert("checkins", null, newValues);
 	}
 	
+	public void addPhoto(long id, long time, String from, String message, String source)
+	{
+		ContentValues newValues = new ContentValues();
+		newValues.put("id", id);
+		newValues.put("time", time);
+		newValues.put("message", message);
+		newValues.put("source", source);
+		newValues.put("poster", from);
+	
+		db.insert("photos", null, newValues);
+	}
+	
 	public void addLike(String name, long status)
 	{
 		ContentValues newValues = new ContentValues();
@@ -95,14 +109,17 @@ public class PostsDatabaseAdapter
 		db.execSQL("DROP TABLE IF EXISTS likes");
 		db.execSQL("DROP TABLE IF EXISTS links");
 		db.execSQL("DROP TABLE IF EXISTS checkins");
+		db.execSQL("DROP TABLE IF EXISTS photos");
 		db.execSQL(PostsDatabaseAdapter.STATII_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.LIKE_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.LINKS_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.CHECKINS_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.PHOTOS_TABLE_CREATE);
 		db.execSQL("delete from statii");
 		db.execSQL("delete from likes");
 		db.execSQL("delete from links");
 		db.execSQL("delete from checkins");
+		db.execSQL("delete from photos");
 	}
 	
 	public ArrayList<Friend> getRankedLikes()
@@ -134,5 +151,9 @@ public class PostsDatabaseAdapter
 	{
 		return db.query("checkins", null, null, null, null, null, null).getCount();
 	}
-			
+	
+	public int getNumberOfPhotos()
+	{
+		return db.query("photos", null, null, null, null, null, null).getCount();
+	}
 }

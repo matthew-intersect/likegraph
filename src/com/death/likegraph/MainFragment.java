@@ -61,7 +61,7 @@ public class MainFragment extends Fragment
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    authButton.setFragment(this);
-	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins"));
+	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins", "user_photos"));
 	    
 	    fetchData.setOnClickListener(new View.OnClickListener()
 		{
@@ -262,7 +262,49 @@ public class MainFragment extends Fragment
 				else
 				{
 					offset = 0;
-//					batchPhotosRequest();
+					batchPhotosRequest();
+				}
+				dialog.dismiss();
+			}
+		});
+		requestBatch.executeAsync();
+	}
+	
+	public void batchPhotosRequest()
+	{
+		dialog.setMessage("Fetching photos...");
+		RequestBatch requestBatch = new RequestBatch();
+		for(int i=0;i<10;i++)
+		{
+			Request req = new Request(Session.getActiveSession(), "/me/photos", null, null, new Request.Callback()
+			{
+				public void onCompleted(Response response)
+				{
+					processPhotosResponse(response);
+				}
+			});
+			Bundle params = new Bundle();
+			params.putString("type", "uploaded");
+			params.putInt("limit", 25);
+			params.putInt("offset", offset);
+			offset+=25;
+			params.putString("fields", "id,name,created_time,likes,source,from");
+			req.setParameters(params);
+			requestBatch.add(req);
+		}
+		requestBatch.addCallback(new RequestBatch.Callback()
+		{
+			@Override
+			public void onBatchCompleted(RequestBatch batch)
+			{
+				if(postsDatabaseAdapter.getNumberOfPhotos()==offset)
+				{
+					batchPhotosRequest();
+				}
+				else
+				{
+					offset = 0;
+//					batchVideosRequest();
 				}
 				dialog.dismiss();
 			}
@@ -354,6 +396,41 @@ public class MainFragment extends Fragment
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("message")) ? item.getString("message") : "";
 				postsDatabaseAdapter.addCheckin(item.getLong("id"), date, from.getString("name"), message, place.getString("name"));
+				if(item.has("likes"))
+				{
+					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
+					JSONArray likeData = likeObject.getJSONArray("data");
+					JSONObject like;
+					for(int j=0;j<likeData.length();j++)
+					{
+						like = likeData.getJSONObject(j);
+						postsDatabaseAdapter.addLike(like.getString("name"), item.getLong("id"));
+					}
+				}
+			}
+			catch (JSONException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void processPhotosResponse(Response response)
+	{
+		GraphObject data = response.getGraphObject();
+		JSONArray photosData = (JSONArray) data.getProperty("data");
+		for(int i=0;i<photosData.length();i++)
+		{
+			JSONObject item;
+			try
+			{
+				item = (JSONObject) photosData.get(i);
+				JSONObject from = (JSONObject) item.getJSONObject("from");
+				String postedDate = item.getString("created_time");
+				DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
+				long date = parser.parseDateTime(postedDate).getMillis();
+				String message = (item.has("name")) ? item.getString("name") : "";
+				postsDatabaseAdapter.addPhoto(item.getLong("id"), date, from.getString("name"), message, item.getString("source"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
