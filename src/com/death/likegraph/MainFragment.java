@@ -65,7 +65,6 @@ public class MainFragment extends Fragment
 	    
 	    fetchData.setOnClickListener(new View.OnClickListener()
 		{
-			
 			@Override
 			public void onClick(View v)
 			{
@@ -74,6 +73,16 @@ public class MainFragment extends Fragment
 		        dialog.show();
 		        postsDatabaseAdapter.clearTables();
 		        batchStatiiRequest();
+			}
+		});
+	    
+	    createGraph.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Intent graph = new Intent(v.getContext(), LikeGraphActivity.class);
+				startActivity(graph);
 			}
 		});
 	    

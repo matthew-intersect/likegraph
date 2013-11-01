@@ -5,7 +5,6 @@
     android:background="#000"
     android:orientation="vertical">
 
-    
     <Button
         android:id="@+id/fetchData"
         android:layout_width="wrap_content"

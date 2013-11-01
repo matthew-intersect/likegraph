@@ -179,4 +179,18 @@ public class PostsDatabaseAdapter
 	{
 		return db.query("videos", null, null, null, null, null, null).getCount();
 	}
+	
+	public ArrayList<Integer> getStatiiCounts()
+	{
+		ArrayList<Integer> counts = new ArrayList<Integer>();
+//		Cursor statiiCounts = db.query("statii,likes", new String[]{"statii.status", "count(likes.id)"},
+//				"statii.id=?", new String[]{"likes.post_id"}, "statii.status", null, null);
+		Cursor statiiCounts = db.rawQuery("select statii.status, count(likes.id) as count from statii,likes where statii.id=likes.post_id group by statii.status order by statii.time desc;", null);
+		while(statiiCounts.moveToNext())
+		{
+			counts.add(statiiCounts.getInt(statiiCounts.getColumnIndex("count")));
+		}
+		statiiCounts.close();
+		return counts;
+	}
 }

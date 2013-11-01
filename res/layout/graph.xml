@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+    android:orientation="vertical">
+
+	<LinearLayout
+		android:id="@+id/sub_layout"
+		android:layout_width="fill_parent"
+		android:layout_height="250dip"
+		android:orientation="vertical" /> 
+
+    <Button
+        android:id="@+id/generateGraph"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/generate"
+        android:layout_marginTop="20dp"
+        />
+
+</LinearLayout>
