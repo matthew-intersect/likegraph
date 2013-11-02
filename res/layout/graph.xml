@@ -8,7 +8,7 @@
 	<LinearLayout
 		android:id="@+id/sub_layout"
 		android:layout_width="fill_parent"
-		android:layout_height="250dip"
+		android:layout_height="360dip"
 		android:orientation="vertical" /> 
 
     <Button
@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/generate"
-        android:layout_marginTop="20dp"
         />
 
 </LinearLayout>
