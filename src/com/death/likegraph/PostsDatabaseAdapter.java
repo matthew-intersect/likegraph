@@ -2,9 +2,12 @@ package com.death.likegraph;
 
 import java.util.ArrayList;
 
+import models.Checkin;
 import models.Link;
+import models.Photo;
 import models.Post;
 import models.Status;
+import models.Video;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -192,6 +195,12 @@ public class PostsDatabaseAdapter
 			posts.addAll(getStatiiCounts());
 		if(links)
 			posts.addAll(getLinkCounts());
+		if(checkins)
+			posts.addAll(getCheckinCounts());
+		if(photos)
+			posts.addAll(getPhotoCounts());
+		if(videos)
+			posts.addAll(getVideoCounts());
 		return posts;
 	}
 	
@@ -231,5 +240,60 @@ public class PostsDatabaseAdapter
 		}
 		linkCounts.close();
 		return links;
+	}
+	
+	public ArrayList<Post> getCheckinCounts()
+	{
+		ArrayList<Post> checkins = new ArrayList<Post>();
+		Cursor checkinCounts = db.rawQuery("select checkins.id, checkins.time, checkins.message, checkins.location, count(likes.id) as count from checkins,likes " +
+				"where checkins.id=likes.post_id group by checkins.id order by checkins.time desc;", null);
+		while(checkinCounts.moveToNext())
+		{
+			long id = checkinCounts.getLong(checkinCounts.getColumnIndex("id"));
+			long time = checkinCounts.getLong(checkinCounts.getColumnIndex("time"));
+			String message = checkinCounts.getString(checkinCounts.getColumnIndex("message"));
+			String location = checkinCounts.getString(checkinCounts.getColumnIndex("location"));
+			int count = checkinCounts.getInt(checkinCounts.getColumnIndex("count"));
+			checkins.add(new Checkin(id, time, message, location, count));
+		}
+		checkinCounts.close();
+		return checkins;
+	}
+	
+	public ArrayList<Post> getPhotoCounts()
+	{
+		ArrayList<Post> photos = new ArrayList<Post>();
+		Cursor photoCounts = db.rawQuery("select photos.id, photos.time, photos.message, photos.source, count(likes.id) as count from photos,likes " +
+				"where photos.id=likes.post_id group by photos.id order by photos.time desc;", null);
+		while(photoCounts.moveToNext())
+		{
+			long id = photoCounts.getLong(photoCounts.getColumnIndex("id"));
+			long time = photoCounts.getLong(photoCounts.getColumnIndex("time"));
+			String message = photoCounts.getString(photoCounts.getColumnIndex("message"));
+			String source = photoCounts.getString(photoCounts.getColumnIndex("source"));
+			int count = photoCounts.getInt(photoCounts.getColumnIndex("count"));
+			photos.add(new Photo(id, time, message, source, count));
+		}
+		photoCounts.close();
+		return photos;
+	}
+	
+	public ArrayList<Post> getVideoCounts()
+	{
+		ArrayList<Post> videos = new ArrayList<Post>();
+		Cursor videoCounts = db.rawQuery("select videos.id, videos.time, videos.name, videos.description, videos.source, count(likes.id) as count from videos,likes " +
+				"where videos.id=likes.post_id group by videos.id order by videos.time desc;", null);
+		while(videoCounts.moveToNext())
+		{
+			long id = videoCounts.getLong(videoCounts.getColumnIndex("id"));
+			long time = videoCounts.getLong(videoCounts.getColumnIndex("time"));
+			String name = videoCounts.getString(videoCounts.getColumnIndex("name"));
+			String description= videoCounts.getString(videoCounts.getColumnIndex("description"));
+			String source = videoCounts.getString(videoCounts.getColumnIndex("source"));
+			int count = videoCounts.getInt(videoCounts.getColumnIndex("count"));
+			videos.add(new Video(id, time, name, description, source, count));
+		}
+		videoCounts.close();
+		return videos;
 	}
 }
