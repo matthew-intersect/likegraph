@@ -2,6 +2,9 @@ package com.death.likegraph;
 
 import java.util.ArrayList;
 
+import models.Post;
+import models.Status;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -180,16 +183,21 @@ public class PostsDatabaseAdapter
 		return db.query("videos", null, null, null, null, null, null).getCount();
 	}
 	
-	public ArrayList<Integer> getStatiiCounts()
+	public ArrayList<Post> getStatiiCounts()
 	{
-		ArrayList<Integer> counts = new ArrayList<Integer>();
+		ArrayList<Post> counts = new ArrayList<Post>();
 //		Cursor statiiCounts = db.query("statii,likes", new String[]{"statii.status", "count(likes.id)"},
 //				"statii.id=?", new String[]{"likes.post_id"}, "statii.status", null, null);
-		Cursor statiiCounts = db.rawQuery("select statii.status, count(likes.id) as count from statii,likes " +
+		Cursor statiiCounts = db.rawQuery("select statii.id, statii.time,statii.status, count(likes.id) as count from statii,likes " +
 				"where statii.id=likes.post_id group by statii.status order by statii.time desc;", null);
 		while(statiiCounts.moveToNext())
 		{
-			counts.add(statiiCounts.getInt(statiiCounts.getColumnIndex("count")));
+			long id = statiiCounts.getLong(statiiCounts.getColumnIndex("id"));
+			long time = statiiCounts.getLong(statiiCounts.getColumnIndex("time"));
+			String status = statiiCounts.getString(statiiCounts.getColumnIndex("status"));
+			int count = statiiCounts.getInt(statiiCounts.getColumnIndex("count"));
+			counts.add(new Status(id, time, count, status));
+//			counts.add(statiiCounts.getInt(statiiCounts.getColumnIndex("count")));
 		}
 		statiiCounts.close();
 		return counts;

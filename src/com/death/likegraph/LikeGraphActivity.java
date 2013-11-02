@@ -2,6 +2,8 @@ package com.death.likegraph;
 
 import java.util.ArrayList;
 
+import models.Post;
+
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
 import org.achartengine.chart.BarChart.Type;
@@ -29,7 +31,7 @@ public class LikeGraphActivity extends Activity
 	
 	private LinearLayout layout;
 	private View graph;
-	private CheckBox checkStatii, checkLinks, checkCheckins, checkPhotos;
+	private CheckBox checkStatii, checkLinks, checkCheckins, checkPhotos, checkVideos;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -45,16 +47,16 @@ public class LikeGraphActivity extends Activity
 	    checkLinks = (CheckBox) findViewById(R.id.check_links);
 	    checkCheckins = (CheckBox) findViewById(R.id.check_checkins);
 	    checkPhotos = (CheckBox) findViewById(R.id.check_photos);
+	    checkVideos = (CheckBox) findViewById(R.id.check_videos);
 	    
 	    renderer = new XYSeriesRenderer();
 	    mRenderer = new XYMultipleSeriesRenderer();
 	    
-	    ArrayList<Integer> counts = postsDatabaseAdapter.getStatiiCounts();
-	    
+	    ArrayList<Post> counts = postsDatabaseAdapter.getStatiiCounts();
 	    CategorySeries series = new CategorySeries("");
 		for(int i=0;i<counts.size();i++)
 		{
-			series.add("", counts.get(i));
+			series.add("", counts.get(i).getLikeCount());
 		}
 		XYMultipleSeriesDataset dataSet = new XYMultipleSeriesDataset();
 		dataSet.addSeries(series.toXYSeries());
@@ -77,9 +79,23 @@ public class LikeGraphActivity extends Activity
         		return false;
         	}
         });
+        
+        View.OnClickListener graphInclusionsListener = new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				
+			}
+		};
+		checkStatii.setOnClickListener(graphInclusionsListener);
+		checkLinks.setOnClickListener(graphInclusionsListener);
+		checkCheckins.setOnClickListener(graphInclusionsListener);
+		checkPhotos.setOnClickListener(graphInclusionsListener);
+		checkVideos.setOnClickListener(graphInclusionsListener);
 	}
 	
-	private void setupRenderers(ArrayList<Integer> counts, XYSeries series)
+	private void setupRenderers(ArrayList<Post> counts, XYSeries series)
 	{
 		renderer.setColor(Color.BLUE);
 		mRenderer.addSeriesRenderer(renderer);
