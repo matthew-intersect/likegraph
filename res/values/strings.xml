@@ -7,5 +7,11 @@
     <string name="fetch_data">Fetch Data</string>
     <string name="create_graph">Create Graph</string>
     <string name="generate">Generate Graph</string>
+    <string name="statuses">Statuses</string>
+    <string name="links">Links</string>
+    <string name="checkins">Check-ins</string>
+    <string name="photos">Photos</string>
+    <string name="videos">Videos</string>
+    <string name="include">Include:</string>
 
 </resources>

@@ -9,14 +9,76 @@
 		android:id="@+id/sub_layout"
 		android:layout_width="fill_parent"
 		android:layout_height="360dip"
-		android:orientation="vertical" /> 
+		android:orientation="vertical" />
+        
+	<TextView
+	    android:id="@+id/include"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginLeft="10dip"
+	    android:text="@string/include"
+	    android:textColor="#FFF"
+	    android:textIsSelectable="false" />
+	
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+	    
+		<CheckBox
+		    android:id="@+id/check_statii"
+		    android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:checked="true"
+	        android:textColor="#FFF"
+	        android:text="@string/statuses" />
+	    
+	    <CheckBox
+		    android:id="@+id/check_links"
+		    android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textColor="#FFF"
+	        android:text="@string/links" />
+	   
+	</LinearLayout>
+	    
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+	    
+	    <CheckBox
+		    android:id="@+id/check_checkins"
+		    android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textColor="#FFF"
+	        android:text="@string/checkins" />
+	    
+	    <CheckBox
+		    android:id="@+id/check_photos"
+		    android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:textColor="#FFF"
+	        android:text="@string/photos" />
 
-    <Button
-        android:id="@+id/generateGraph"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/generate"
-        />
+	</LinearLayout>
+	    
+	<LinearLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+	    
+	    <CheckBox
+		    android:id="@+id/check_videos"
+		    android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textColor="#FFF"
+	        android:text="@string/videos" />
+	    
+	</LinearLayout>
 
 </LinearLayout>
