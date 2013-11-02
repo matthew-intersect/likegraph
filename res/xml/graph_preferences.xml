@@ -1,0 +1,14 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:title="@string/settings" >
+    
+    <ListPreference
+        android:key="graph_bars"
+        android:title="@string/bars"
+        android:summary="@string/bars_preference_summary"
+        android:entries="@array/graph_bars"
+        android:entryValues="@array/graph_bars"
+        android:defaultValue="50" />
+    
+</PreferenceScreen>

@@ -52,7 +52,7 @@ public class MainFragment extends Fragment
 	        ViewGroup container, 
 	        Bundle savedInstanceState)
 	{
-	    View view = inflater.inflate(R.layout.activity_main, container, false);
+	    View view = inflater.inflate(R.layout.main, container, false);
 
 	    postsDatabaseAdapter = new PostsDatabaseAdapter(getActivity());
 	    postsDatabaseAdapter = postsDatabaseAdapter.open();

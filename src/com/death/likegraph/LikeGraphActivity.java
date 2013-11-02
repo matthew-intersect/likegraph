@@ -18,8 +18,14 @@ import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -28,6 +34,7 @@ import android.widget.Toast;
 public class LikeGraphActivity extends Activity
 {
 	private PostsDatabaseAdapter postsDatabaseAdapter;
+	private SharedPreferences sharedPrefs;
 	
 	private XYSeriesRenderer renderer;
 	private XYMultipleSeriesRenderer mRenderer;
@@ -45,6 +52,7 @@ public class LikeGraphActivity extends Activity
 
 	    postsDatabaseAdapter = new PostsDatabaseAdapter(this);
 	    postsDatabaseAdapter = postsDatabaseAdapter.open();
+	    sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    
 	    layout = (LinearLayout) findViewById(R.id.sub_layout);
 	    checkStatii = (CheckBox) findViewById(R.id.check_statii);
@@ -110,6 +118,29 @@ public class LikeGraphActivity extends Activity
 		checkVideos.setOnClickListener(graphInclusionsListener);
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.graph_menu, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch(item.getItemId())
+		{
+			case R.id.graph_settings:
+			{
+				Intent graphPreferences = new Intent(LikeGraphActivity.this, GraphPreferenceActivity.class);
+				startActivity(graphPreferences);
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	private void setupRenderers(ArrayList<Post> posts, XYSeries series)
 	{
 		renderer.setColor(Color.BLUE);
@@ -123,7 +154,7 @@ public class LikeGraphActivity extends Activity
         mRenderer.setPanEnabled(true, false);
         mRenderer.setPanLimits(new double[]{-1, posts.size(), 0, series.getMaxY()});
         mRenderer.setXAxisMin(-1);
-        mRenderer.setXAxisMax(50);
+        mRenderer.setXAxisMax(Integer.parseInt(sharedPrefs.getString("graph_bars", "50")));
         mRenderer.setShowLegend(false);
         mRenderer.setXLabels(0);
         mRenderer.setLabelsTextSize(30);
