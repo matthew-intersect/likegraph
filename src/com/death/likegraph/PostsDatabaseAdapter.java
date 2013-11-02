@@ -2,6 +2,7 @@ package com.death.likegraph;
 
 import java.util.ArrayList;
 
+import models.Link;
 import models.Post;
 import models.Status;
 
@@ -183,23 +184,52 @@ public class PostsDatabaseAdapter
 		return db.query("videos", null, null, null, null, null, null).getCount();
 	}
 	
+	public ArrayList<Post> getPosts(boolean statii, boolean links, boolean checkins, 
+			boolean photos, boolean videos)
+	{
+		ArrayList<Post> posts = new ArrayList<Post>();
+		if(statii)
+			posts.addAll(getStatiiCounts());
+		if(links)
+			posts.addAll(getLinkCounts());
+		return posts;
+	}
+	
 	public ArrayList<Post> getStatiiCounts()
 	{
-		ArrayList<Post> counts = new ArrayList<Post>();
+		ArrayList<Post> statii = new ArrayList<Post>();
 //		Cursor statiiCounts = db.query("statii,likes", new String[]{"statii.status", "count(likes.id)"},
 //				"statii.id=?", new String[]{"likes.post_id"}, "statii.status", null, null);
-		Cursor statiiCounts = db.rawQuery("select statii.id, statii.time,statii.status, count(likes.id) as count from statii,likes " +
-				"where statii.id=likes.post_id group by statii.status order by statii.time desc;", null);
-		while(statiiCounts.moveToNext())
+		Cursor statusCounts = db.rawQuery("select statii.id, statii.time, statii.status, count(likes.id) as count from statii,likes " +
+				"where statii.id=likes.post_id group by statii.id order by statii.time desc;", null);
+		while(statusCounts.moveToNext())
 		{
-			long id = statiiCounts.getLong(statiiCounts.getColumnIndex("id"));
-			long time = statiiCounts.getLong(statiiCounts.getColumnIndex("time"));
-			String status = statiiCounts.getString(statiiCounts.getColumnIndex("status"));
-			int count = statiiCounts.getInt(statiiCounts.getColumnIndex("count"));
-			counts.add(new Status(id, time, count, status));
+			long id = statusCounts.getLong(statusCounts.getColumnIndex("id"));
+			long time = statusCounts.getLong(statusCounts.getColumnIndex("time"));
+			String status = statusCounts.getString(statusCounts.getColumnIndex("status"));
+			int count = statusCounts.getInt(statusCounts.getColumnIndex("count"));
+			statii.add(new Status(id, time, status, count));
 //			counts.add(statiiCounts.getInt(statiiCounts.getColumnIndex("count")));
 		}
-		statiiCounts.close();
-		return counts;
+		statusCounts.close();
+		return statii;
+	}
+	
+	public ArrayList<Post> getLinkCounts()
+	{
+		ArrayList<Post> links = new ArrayList<Post>();
+		Cursor linkCounts = db.rawQuery("select links.id, links.time, links.message, links.link, count(likes.id) as count from links,likes " +
+				"where links.id=likes.post_id group by links.id order by links.time desc;", null);
+		while(linkCounts.moveToNext())
+		{
+			long id = linkCounts.getLong(linkCounts.getColumnIndex("id"));
+			long time = linkCounts.getLong(linkCounts.getColumnIndex("time"));
+			String message = linkCounts.getString(linkCounts.getColumnIndex("message"));
+			String link = linkCounts.getString(linkCounts.getColumnIndex("link"));
+			int count = linkCounts.getInt(linkCounts.getColumnIndex("count"));
+			links.add(new Link(id, time, message, link, count));
+		}
+		linkCounts.close();
+		return links;
 	}
 }

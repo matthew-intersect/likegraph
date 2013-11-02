@@ -1,6 +1,9 @@
 package com.death.likegraph;
 
+import helpers.PostLikesComparator;
+
 import java.util.ArrayList;
+import java.util.Collections;
 
 import models.Post;
 
@@ -28,6 +31,7 @@ public class LikeGraphActivity extends Activity
 	
 	private XYSeriesRenderer renderer;
 	private XYMultipleSeriesRenderer mRenderer;
+	private XYMultipleSeriesDataset dataset;
 	
 	private LinearLayout layout;
 	private View graph;
@@ -51,6 +55,7 @@ public class LikeGraphActivity extends Activity
 	    
 	    renderer = new XYSeriesRenderer();
 	    mRenderer = new XYMultipleSeriesRenderer();
+	    dataset = new XYMultipleSeriesDataset();
 	    
 	    ArrayList<Post> counts = postsDatabaseAdapter.getStatiiCounts();
 	    CategorySeries series = new CategorySeries("");
@@ -58,12 +63,11 @@ public class LikeGraphActivity extends Activity
 		{
 			series.add("", counts.get(i).getLikeCount());
 		}
-		XYMultipleSeriesDataset dataSet = new XYMultipleSeriesDataset();
-		dataSet.addSeries(series.toXYSeries());
+		dataset.addSeries(series.toXYSeries());
 		setupRenderers(counts, series.toXYSeries());
-		mRenderer.setPanLimits(new double[]{-1,counts.size(),0,series.toXYSeries().getMaxY()});
-        graph = ChartFactory.getBarChartView(getApplicationContext(), dataSet, mRenderer, Type.DEFAULT);
+        graph = ChartFactory.getBarChartView(getApplicationContext(), dataset, mRenderer, Type.DEFAULT);
         layout.addView(graph);
+        
         graph.setOnLongClickListener(new View.OnLongClickListener()
         {
         	@Override
@@ -85,7 +89,18 @@ public class LikeGraphActivity extends Activity
 			@Override
 			public void onClick(View v)
 			{
-				
+				ArrayList<Post> posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
+						checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked());
+				Collections.sort(posts, new PostLikesComparator());
+				CategorySeries series = new CategorySeries("");
+				for(int i=0;i<posts.size();i++)
+				{
+					series.add("", posts.get(i).getLikeCount());
+				}
+				dataset.removeSeries(0);
+				dataset.addSeries(series.toXYSeries());
+				setupRenderers(posts, series.toXYSeries());
+				((GraphicalView) graph).repaint();
 			}
 		};
 		checkStatii.setOnClickListener(graphInclusionsListener);
@@ -95,9 +110,10 @@ public class LikeGraphActivity extends Activity
 		checkVideos.setOnClickListener(graphInclusionsListener);
 	}
 	
-	private void setupRenderers(ArrayList<Post> counts, XYSeries series)
+	private void setupRenderers(ArrayList<Post> posts, XYSeries series)
 	{
 		renderer.setColor(Color.BLUE);
+		mRenderer.removeAllRenderers();
 		mRenderer.addSeriesRenderer(renderer);
 		mRenderer.setYTitle("Likes");
 		mRenderer.setAxisTitleTextSize(25);
@@ -105,7 +121,7 @@ public class LikeGraphActivity extends Activity
 		mRenderer.setApplyBackgroundColor(true);
         mRenderer.setBackgroundColor(Color.BLACK);
         mRenderer.setPanEnabled(true, false);
-        mRenderer.setPanLimits(new double[]{-1, counts.size(), 0, series.getMaxY()});
+        mRenderer.setPanLimits(new double[]{-1, posts.size(), 0, series.getMaxY()});
         mRenderer.setXAxisMin(-1);
         mRenderer.setXAxisMax(50);
         mRenderer.setShowLegend(false);

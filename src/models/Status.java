@@ -4,7 +4,7 @@ public class Status extends Post
 {
 	private String status;
 
-	public Status(long id, long time, int likes, String status)
+	public Status(long id, long time, String status, int likes)
 	{
 		super(id, time, likes);
 		this.setStatus(status);
