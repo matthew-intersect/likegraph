@@ -14,7 +14,9 @@
     <string name="videos">Videos</string>
     <string name="include">Include:</string>
     <string name="settings">Settings</string>
-    <string name="bars">Bars</string>
+    <string name="bars">Number of Bars</string>
+    <string name="bar_colours">Bar Colour</string>
     <string name="bars_preference_summary">Set the number of viewable bars</string>
+    <string name="bar_colours_preference_summary">Set the colour of the bars</string>
 
 </resources>

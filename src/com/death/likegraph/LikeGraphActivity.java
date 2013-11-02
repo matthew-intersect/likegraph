@@ -17,6 +17,7 @@ import org.achartengine.model.XYSeries;
 import org.achartengine.renderer.XYMultipleSeriesRenderer;
 import org.achartengine.renderer.XYSeriesRenderer;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -44,6 +45,7 @@ public class LikeGraphActivity extends Activity
 	private View graph;
 	private CheckBox checkStatii, checkLinks, checkCheckins, checkPhotos, checkVideos;
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -116,6 +118,8 @@ public class LikeGraphActivity extends Activity
 		checkCheckins.setOnClickListener(graphInclusionsListener);
 		checkPhotos.setOnClickListener(graphInclusionsListener);
 		checkVideos.setOnClickListener(graphInclusionsListener);
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 	@Override
@@ -143,7 +147,7 @@ public class LikeGraphActivity extends Activity
 	
 	private void setupRenderers(ArrayList<Post> posts, XYSeries series)
 	{
-		renderer.setColor(Color.BLUE);
+		renderer.setColor(getColour(sharedPrefs.getString("graph_bar_colour", "blue")));
 		mRenderer.removeAllRenderers();
 		mRenderer.addSeriesRenderer(renderer);
 		mRenderer.setYTitle("Likes");
@@ -151,15 +155,46 @@ public class LikeGraphActivity extends Activity
 		mRenderer.setShowGridY(true);
 		mRenderer.setApplyBackgroundColor(true);
         mRenderer.setBackgroundColor(Color.BLACK);
+        if(!sharedPrefs.getBoolean("graph_all_bars", false))
+        {
+        	mRenderer.setXAxisMax(Integer.parseInt(sharedPrefs.getString("graph_number_bars", "50")));
+        }
         mRenderer.setPanEnabled(true, false);
         mRenderer.setPanLimits(new double[]{-1, posts.size(), 0, series.getMaxY()});
         mRenderer.setXAxisMin(-1);
-        mRenderer.setXAxisMax(Integer.parseInt(sharedPrefs.getString("graph_bars", "50")));
         mRenderer.setShowLegend(false);
         mRenderer.setXLabels(0);
         mRenderer.setLabelsTextSize(30);
         mRenderer.setBarSpacing(.1);
         mRenderer.setMargins(new int[]{20, 50, 0, 20});
         mRenderer.setClickEnabled(true);
+	}
+	
+	private int getColour(String colour)
+	{
+		if(colour.equals("Red"))
+		{
+			return Color.RED;
+		}
+		else if(colour.equals("Green"))
+		{
+			return Color.GREEN;
+		}
+		else if(colour.equals("Yellow"))
+		{
+			return Color.YELLOW;
+		}
+		else if(colour.equals("Orange"))
+		{
+			return Color.rgb(255, 165, 0);
+		}
+		else if(colour.equals("Purple"))
+		{
+			return Color.rgb(160, 32, 240);
+		}
+		else
+		{
+			return Color.BLUE;
+		}
 	}
 }

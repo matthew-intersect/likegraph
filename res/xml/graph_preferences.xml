@@ -4,7 +4,22 @@
     android:title="@string/settings" >
     
     <ListPreference
-        android:key="graph_bars"
+        android:key="graph_bar_colour"
+        android:title="@string/bar_colours"
+        android:summary="@string/bar_colours_preference_summary"
+        android:entries="@array/graph_bar_colours"
+        android:entryValues="@array/graph_bar_colours"
+        android:defaultValue="Blue" />
+    
+    <CheckBoxPreference
+        android:key="graph_all_bars"
+        android:disableDependentsState="true"
+        android:title="Show all bars"
+		android:defaultValue="false" />
+    
+    <ListPreference
+        android:key="graph_number_bars"
+        android:dependency="graph_all_bars"
         android:title="@string/bars"
         android:summary="@string/bars_preference_summary"
         android:entries="@array/graph_bars"
