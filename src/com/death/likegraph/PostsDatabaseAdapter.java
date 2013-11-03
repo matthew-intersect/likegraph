@@ -3,6 +3,7 @@ package com.death.likegraph;
 import java.util.ArrayList;
 
 import models.Checkin;
+import models.Friend;
 import models.Link;
 import models.Photo;
 import models.Post;
@@ -21,7 +22,7 @@ public class PostsDatabaseAdapter
 	static final int DATABASE_VERSION = 1;
 	
 	static final String STATII_TABLE_CREATE = "create table statii" +
-	                             "( id long primary key, time long, status text); ";
+	        "( id long primary key, time long, status text); ";
 	static final String LINKS_TABLE_CREATE = "create table links" +
             "( id long primary key, time long, message text, link text); ";
 	static final String CHECKINS_TABLE_CREATE = "create table checkins" +
@@ -31,7 +32,9 @@ public class PostsDatabaseAdapter
 	static final String VIDEOS_TABLE_CREATE = "create table videos" + 
 			"( id long primary key, time long, poster text, name text, description text, source text); ";
 	static final String LIKE_TABLE_CREATE = "create table likes" + 
-	                             "( id integer primary key autoincrement, name text, post_id long); ";
+	        "( id integer primary key autoincrement, name text, post_id long); ";
+	static final String FRIENDS_TABLE_CREATE = "create table friends" +
+            "( id long primary key, name text, picture text);";
 	public SQLiteDatabase db;
 	private final Context context;
 	private DatabaseHelper dbHelper;
@@ -116,6 +119,16 @@ public class PostsDatabaseAdapter
 		db.insert("videos", null, newValues);
 	}
 	
+	public void addFriend(long id, String name, String link)
+	{
+		ContentValues newValues = new ContentValues();
+		newValues.put("id", id);
+		newValues.put("name", name);
+		newValues.put("picture", link);
+		
+		db.insert("friends", null, newValues);
+	}
+	
 	public void addLike(String name, long status)
 	{
 		ContentValues newValues = new ContentValues();
@@ -133,33 +146,39 @@ public class PostsDatabaseAdapter
 		db.execSQL("DROP TABLE IF EXISTS checkins");
 		db.execSQL("DROP TABLE IF EXISTS photos");
 		db.execSQL("DROP TABLE IF EXISTS videos");
+		db.execSQL("DROP TABLE IF EXISTS friends");
 		db.execSQL(PostsDatabaseAdapter.STATII_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.LIKE_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.LINKS_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.CHECKINS_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.PHOTOS_TABLE_CREATE);
 		db.execSQL(PostsDatabaseAdapter.VIDEOS_TABLE_CREATE);
+		db.execSQL(PostsDatabaseAdapter.FRIENDS_TABLE_CREATE);
 		db.execSQL("delete from statii");
 		db.execSQL("delete from likes");
 		db.execSQL("delete from links");
 		db.execSQL("delete from checkins");
 		db.execSQL("delete from photos");
 		db.execSQL("delete from videos");
+		db.execSQL("delete from friends");
 	}
 	
 	public ArrayList<Friend> getRankedLikes()
 	{
-		Cursor results = db.query("likes", new String[]{"name", "count(*) as count"}, null, null, "name", null, "count desc", "20");
+		Cursor friendRanksResults = db.rawQuery("select friends.id,friends.name,friends.picture,count(likes.id) as count " +
+				"from friends left outer join likes on friends.name=likes.name group by friends.name;", null);
 		
-		ArrayList<Friend> ranks = new ArrayList<Friend>();
-		while(results.moveToNext())
+		ArrayList<Friend> friendRanks = new ArrayList<Friend>();
+		while(friendRanksResults.moveToNext())
 		{
-			String name = results.getString(results.getColumnIndex("name"));
-			int count = results.getInt(results.getColumnIndex("count"));
-			ranks.add(new Friend(name, count));
+			long id = friendRanksResults.getLong(friendRanksResults.getColumnIndex("id"));
+			String name = friendRanksResults.getString(friendRanksResults.getColumnIndex("name"));
+			String picture = friendRanksResults.getString(friendRanksResults.getColumnIndex("picture"));
+			int count = friendRanksResults.getInt(friendRanksResults.getColumnIndex("count"));
+			friendRanks.add(new Friend(id, name, picture, count));
 		}
 		
-		return ranks;
+		return friendRanks;
 	}
 	
 	public int getNumberOfStatii()

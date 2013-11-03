@@ -6,6 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="fetch_data">Fetch Data</string>
     <string name="create_graph">Create Graph</string>
+    <string name="rank_friends">Rank Friends</string>
     <string name="generate">Generate Graph</string>
     <string name="statuses">Statuses</string>
     <string name="links">Links</string>

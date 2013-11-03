@@ -1,6 +1,5 @@
 package com.death.likegraph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.joda.time.format.DateTimeFormatter;
@@ -9,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.RequestBatch;
 import com.facebook.Response;
@@ -36,7 +36,7 @@ public class MainFragment extends Fragment
 	int offset = 0;
 	
 	private ProgressDialog dialog;
-	private Button fetchData, createGraph;
+	private Button fetchData, createGraph, rankFriends;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -60,6 +60,7 @@ public class MainFragment extends Fragment
 	    LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
+	    rankFriends = (Button) view.findViewById(R.id.rankFriends);
 	    authButton.setFragment(this);
 	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins", "user_photos", "user_videos"));
 	    
@@ -83,6 +84,16 @@ public class MainFragment extends Fragment
 			{
 				Intent graph = new Intent(v.getContext(), LikeGraphActivity.class);
 				startActivity(graph);
+			}
+		});
+	    
+	    rankFriends.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Intent rank = new Intent(v.getContext(), RankFriendsActivity.class);
+				startActivity(rank);
 			}
 		});
 	    
@@ -149,12 +160,14 @@ public class MainFragment extends Fragment
 	    	Log.i(TAG, "Logged in...");
 	    	fetchData.setVisibility(View.VISIBLE);
 	    	createGraph.setVisibility(View.VISIBLE);
+	    	rankFriends.setVisibility(View.VISIBLE);
 	    }
 	    else if (state.isClosed())
 	    {
 	        Log.i(TAG, "Logged out...");
 	        fetchData.setVisibility(View.INVISIBLE);
 	        createGraph.setVisibility(View.INVISIBLE);
+	        rankFriends.setVisibility(View.INVISIBLE);
 	    }
 	}
 	
@@ -353,11 +366,47 @@ public class MainFragment extends Fragment
 				else
 				{
 					offset = 0;
-					dialog.dismiss();
+					fetchFriends();
 				}
 			}
 		});
 		requestBatch.executeAsync();
+	}
+	
+	public void fetchFriends()
+	{
+		dialog.setMessage("Fetching friends...");
+		String fqlQuery = "SELECT uid, name, pic FROM user WHERE uid IN " +
+	              "(SELECT uid2 FROM friend WHERE uid1 = me())";
+		Bundle params = new Bundle();
+        params.putString("q", fqlQuery);
+        Request request = new Request(Session.getActiveSession(), "/fql", params,
+        		HttpMethod.GET, new Request.Callback()
+        {         
+            public void onCompleted(Response response)
+            {
+                GraphObject data = response.getGraphObject();
+        		JSONArray friendsData = (JSONArray) data.getProperty("data");
+        		for(int i=0;i<friendsData.length();i++)
+        		{
+        			JSONObject item;
+        			try
+        			{
+        				item = (JSONObject) friendsData.get(i);
+        				long id = Long.parseLong(item.getString("uid"));
+        				String name = item.getString("name");
+        				String link = item.getString("pic");
+        				postsDatabaseAdapter.addFriend(id, name, link);
+        			}
+        			catch (JSONException e)
+        			{
+        				e.printStackTrace();
+        			}
+        		}
+                dialog.dismiss();
+            }                  
+    	});
+        Request.executeBatchAsync(request);
 	}
 	
 	public void processStatiiResponse(Response response)
@@ -599,14 +648,4 @@ public class MainFragment extends Fragment
 		req.setParameters(params);
 		req.executeAsync();
 	}
-	
-	public void rankFriends()
-	{
-		ArrayList<Friend> ranks = postsDatabaseAdapter.getRankedLikes();
-		for(Friend f: ranks)
-		{
-			System.out.println(f.getName() + ": " + f.getCount());
-		}
-	}
-	
 }
