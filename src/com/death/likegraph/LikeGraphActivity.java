@@ -99,6 +99,7 @@ public class LikeGraphActivity extends Activity
 			@Override
 			public void onClick(View v)
 			{
+				updateCheckPreferences();
 				ArrayList<Post> posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
 						checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked());
 				Collections.sort(posts, new PostLikesComparator());
@@ -113,10 +114,15 @@ public class LikeGraphActivity extends Activity
 				((GraphicalView) graph).repaint();
 			}
 		};
+		checkStatii.setChecked(sharedPrefs.getBoolean("checkStatii", true));
 		checkStatii.setOnClickListener(graphInclusionsListener);
+		checkLinks.setChecked(sharedPrefs.getBoolean("checkLinks", false));
 		checkLinks.setOnClickListener(graphInclusionsListener);
+		checkCheckins.setChecked(sharedPrefs.getBoolean("checkCheckins", false));
 		checkCheckins.setOnClickListener(graphInclusionsListener);
+		checkPhotos.setChecked(sharedPrefs.getBoolean("checkPhotos", false));
 		checkPhotos.setOnClickListener(graphInclusionsListener);
+		checkVideos.setChecked(sharedPrefs.getBoolean("checkVideos", false));
 		checkVideos.setOnClickListener(graphInclusionsListener);
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -168,6 +174,15 @@ public class LikeGraphActivity extends Activity
         mRenderer.setBarSpacing(.1);
         mRenderer.setMargins(new int[]{20, 50, 0, 20});
         mRenderer.setClickEnabled(true);
+	}
+	
+	private void updateCheckPreferences()
+	{
+		sharedPrefs.edit().putBoolean("checkStatii", checkStatii.isChecked()).commit();
+		sharedPrefs.edit().putBoolean("checkLinks", checkLinks.isChecked()).commit();
+		sharedPrefs.edit().putBoolean("checkCheckins", checkCheckins.isChecked()).commit();
+		sharedPrefs.edit().putBoolean("checkPhotos", checkPhotos.isChecked()).commit();
+		sharedPrefs.edit().putBoolean("checkVideos", checkVideos.isChecked()).commit();
 	}
 	
 	private int getColour(String colour)
