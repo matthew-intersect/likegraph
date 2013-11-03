@@ -188,7 +188,7 @@ public class PostsDatabaseAdapter
 	}
 	
 	public ArrayList<Post> getPosts(boolean statii, boolean links, boolean checkins, 
-			boolean photos, boolean videos)
+			boolean photos, boolean videos, boolean excludeZeroPhotos)
 	{
 		ArrayList<Post> posts = new ArrayList<Post>();
 		if(statii)
@@ -198,7 +198,7 @@ public class PostsDatabaseAdapter
 		if(checkins)
 			posts.addAll(getCheckinCounts());
 		if(photos)
-			posts.addAll(getPhotoCounts());
+			posts.addAll(getPhotoCounts(excludeZeroPhotos));
 		if(videos)
 			posts.addAll(getVideoCounts());
 		return posts;
@@ -209,8 +209,8 @@ public class PostsDatabaseAdapter
 		ArrayList<Post> statii = new ArrayList<Post>();
 //		Cursor statiiCounts = db.query("statii,likes", new String[]{"statii.status", "count(likes.id)"},
 //				"statii.id=?", new String[]{"likes.post_id"}, "statii.status", null, null);
-		Cursor statusCounts = db.rawQuery("select statii.id, statii.time, statii.status, count(likes.id) as count from statii,likes " +
-				"where statii.id=likes.post_id group by statii.id order by statii.time desc;", null);
+		Cursor statusCounts = db.rawQuery("select statii.id, statii.time, statii.status, count(likes.id) as count from statii " +
+				"left outer join likes on statii.id=likes.post_id group by statii.id order by statii.time desc;", null);
 		while(statusCounts.moveToNext())
 		{
 			long id = statusCounts.getLong(statusCounts.getColumnIndex("id"));
@@ -218,7 +218,6 @@ public class PostsDatabaseAdapter
 			String status = statusCounts.getString(statusCounts.getColumnIndex("status"));
 			int count = statusCounts.getInt(statusCounts.getColumnIndex("count"));
 			statii.add(new Status(id, time, status, count));
-//			counts.add(statiiCounts.getInt(statiiCounts.getColumnIndex("count")));
 		}
 		statusCounts.close();
 		return statii;
@@ -227,8 +226,8 @@ public class PostsDatabaseAdapter
 	public ArrayList<Post> getLinkCounts()
 	{
 		ArrayList<Post> links = new ArrayList<Post>();
-		Cursor linkCounts = db.rawQuery("select links.id, links.time, links.message, links.link, count(likes.id) as count from links,likes " +
-				"where links.id=likes.post_id group by links.id order by links.time desc;", null);
+		Cursor linkCounts = db.rawQuery("select links.id, links.time, links.message, links.link, count(likes.id) as count from links " +
+				"left outer join likes on links.id=likes.post_id group by links.id order by links.time desc;", null);
 		while(linkCounts.moveToNext())
 		{
 			long id = linkCounts.getLong(linkCounts.getColumnIndex("id"));
@@ -245,8 +244,8 @@ public class PostsDatabaseAdapter
 	public ArrayList<Post> getCheckinCounts()
 	{
 		ArrayList<Post> checkins = new ArrayList<Post>();
-		Cursor checkinCounts = db.rawQuery("select checkins.id, checkins.time, checkins.message, checkins.location, count(likes.id) as count from checkins,likes " +
-				"where checkins.id=likes.post_id group by checkins.id order by checkins.time desc;", null);
+		Cursor checkinCounts = db.rawQuery("select checkins.id, checkins.time, checkins.message, checkins.location, count(likes.id) as count from checkins " +
+				"left outer join likes on checkins.id=likes.post_id group by checkins.id order by checkins.time desc;", null);
 		while(checkinCounts.moveToNext())
 		{
 			long id = checkinCounts.getLong(checkinCounts.getColumnIndex("id"));
@@ -260,11 +259,11 @@ public class PostsDatabaseAdapter
 		return checkins;
 	}
 	
-	public ArrayList<Post> getPhotoCounts()
+	public ArrayList<Post> getPhotoCounts(boolean excludeZeroPhotos)
 	{
 		ArrayList<Post> photos = new ArrayList<Post>();
-		Cursor photoCounts = db.rawQuery("select photos.id, photos.time, photos.message, photos.source, count(likes.id) as count from photos,likes " +
-				"where photos.id=likes.post_id group by photos.id order by photos.time desc;", null);
+		Cursor photoCounts = db.rawQuery("select photos.id, photos.time, photos.message, photos.source, count(likes.id) as count from photos " +
+				"left outer join likes on photos.id=likes.post_id group by photos.id order by photos.time desc;", null);
 		while(photoCounts.moveToNext())
 		{
 			long id = photoCounts.getLong(photoCounts.getColumnIndex("id"));
@@ -272,7 +271,8 @@ public class PostsDatabaseAdapter
 			String message = photoCounts.getString(photoCounts.getColumnIndex("message"));
 			String source = photoCounts.getString(photoCounts.getColumnIndex("source"));
 			int count = photoCounts.getInt(photoCounts.getColumnIndex("count"));
-			photos.add(new Photo(id, time, message, source, count));
+			if((excludeZeroPhotos && count!=0) || !excludeZeroPhotos)
+				photos.add(new Photo(id, time, message, source, count));
 		}
 		photoCounts.close();
 		return photos;
@@ -281,8 +281,8 @@ public class PostsDatabaseAdapter
 	public ArrayList<Post> getVideoCounts()
 	{
 		ArrayList<Post> videos = new ArrayList<Post>();
-		Cursor videoCounts = db.rawQuery("select videos.id, videos.time, videos.name, videos.description, videos.source, count(likes.id) as count from videos,likes " +
-				"where videos.id=likes.post_id group by videos.id order by videos.time desc;", null);
+		Cursor videoCounts = db.rawQuery("select videos.id, videos.time, videos.name, videos.description, videos.source, count(likes.id) as count from videos " +
+				"left outer join likes on videos.id=likes.post_id group by videos.id order by videos.time desc;", null);
 		while(videoCounts.moveToNext())
 		{
 			long id = videoCounts.getLong(videoCounts.getColumnIndex("id"));

@@ -66,15 +66,23 @@ public class LikeGraphActivity extends Activity
 	    renderer = new XYSeriesRenderer();
 	    mRenderer = new XYMultipleSeriesRenderer();
 	    dataset = new XYMultipleSeriesDataset();
+
+	    checkStatii.setChecked(sharedPrefs.getBoolean("checkStatii", true));
+	    checkLinks.setChecked(sharedPrefs.getBoolean("checkLinks", false));
+	    checkCheckins.setChecked(sharedPrefs.getBoolean("checkCheckins", false));
+	    checkPhotos.setChecked(sharedPrefs.getBoolean("checkPhotos", false));
+	    checkVideos.setChecked(sharedPrefs.getBoolean("checkVideos", false));
 	    
-	    ArrayList<Post> counts = postsDatabaseAdapter.getStatiiCounts();
+	    ArrayList<Post> posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
+				checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
+				sharedPrefs.getBoolean("exclude_zero_photos", true));
 	    CategorySeries series = new CategorySeries("");
-		for(int i=0;i<counts.size();i++)
+		for(int i=0;i<posts.size();i++)
 		{
-			series.add("", counts.get(i).getLikeCount());
+			series.add("", posts.get(i).getLikeCount());
 		}
 		dataset.addSeries(series.toXYSeries());
-		setupRenderers(counts, series.toXYSeries());
+		setupRenderers(posts, series.toXYSeries());
         graph = ChartFactory.getBarChartView(getApplicationContext(), dataset, mRenderer, Type.DEFAULT);
         layout.addView(graph);
         
@@ -101,7 +109,8 @@ public class LikeGraphActivity extends Activity
 			{
 				updateCheckPreferences();
 				ArrayList<Post> posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
-						checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked());
+						checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
+						sharedPrefs.getBoolean("exclude_zero_photos", true));
 				Collections.sort(posts, new PostLikesComparator());
 				CategorySeries series = new CategorySeries("");
 				for(int i=0;i<posts.size();i++)
@@ -114,15 +123,10 @@ public class LikeGraphActivity extends Activity
 				((GraphicalView) graph).repaint();
 			}
 		};
-		checkStatii.setChecked(sharedPrefs.getBoolean("checkStatii", true));
 		checkStatii.setOnClickListener(graphInclusionsListener);
-		checkLinks.setChecked(sharedPrefs.getBoolean("checkLinks", false));
 		checkLinks.setOnClickListener(graphInclusionsListener);
-		checkCheckins.setChecked(sharedPrefs.getBoolean("checkCheckins", false));
 		checkCheckins.setOnClickListener(graphInclusionsListener);
-		checkPhotos.setChecked(sharedPrefs.getBoolean("checkPhotos", false));
 		checkPhotos.setOnClickListener(graphInclusionsListener);
-		checkVideos.setChecked(sharedPrefs.getBoolean("checkVideos", false));
 		checkVideos.setOnClickListener(graphInclusionsListener);
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -153,11 +157,12 @@ public class LikeGraphActivity extends Activity
 	
 	private void setupRenderers(ArrayList<Post> posts, XYSeries series)
 	{
-		renderer.setColor(getColour(sharedPrefs.getString("graph_bar_colour", "blue")));
+		renderer.setColor(getColour(sharedPrefs.getString("graph_bar_colour", "Blue")));
 		mRenderer.removeAllRenderers();
 		mRenderer.addSeriesRenderer(renderer);
 		mRenderer.setYTitle("Likes");
 		mRenderer.setAxisTitleTextSize(25);
+		mRenderer.setShowGrid(true);
 		mRenderer.setShowGridY(true);
 		mRenderer.setApplyBackgroundColor(true);
         mRenderer.setBackgroundColor(Color.BLACK);
@@ -168,6 +173,7 @@ public class LikeGraphActivity extends Activity
         mRenderer.setPanEnabled(true, false);
         mRenderer.setPanLimits(new double[]{-1, posts.size(), 0, series.getMaxY()});
         mRenderer.setXAxisMin(-1);
+        mRenderer.setYAxisMin(-1);
         mRenderer.setShowLegend(false);
         mRenderer.setXLabels(0);
         mRenderer.setLabelsTextSize(30);

@@ -14,7 +14,7 @@
     <CheckBoxPreference
         android:key="graph_all_bars"
         android:disableDependentsState="true"
-        android:title="Show all bars"
+        android:title="@string/show_all_bars"
 		android:defaultValue="false" />
     
     <ListPreference
@@ -25,5 +25,10 @@
         android:entries="@array/graph_bars"
         android:entryValues="@array/graph_bars"
         android:defaultValue="50" />
+    
+    <CheckBoxPreference
+        android:key="exclude_zero_photos"
+        android:title="@string/exclude_zero_photos_summary"
+        android:defaultValue="true" />
     
 </PreferenceScreen>

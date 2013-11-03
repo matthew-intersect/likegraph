@@ -18,5 +18,7 @@
     <string name="bar_colours">Bar Colour</string>
     <string name="bars_preference_summary">Set the number of viewable bars</string>
     <string name="bar_colours_preference_summary">Set the colour of the bars</string>
+    <string name="show_all_bars">Show all bars</string>
+    <string name="exclude_zero_photos_summary">Exclude photos with no likes</string>
 
 </resources>
