@@ -166,7 +166,7 @@ public class PostsDatabaseAdapter
 	public ArrayList<Friend> getRankedLikes()
 	{
 		Cursor friendRanksResults = db.rawQuery("select friends.id,friends.name,friends.picture,count(likes.id) as count " +
-				"from friends left outer join likes on friends.name=likes.name group by friends.name;", null);
+				"from friends left outer join likes on friends.name=likes.name group by friends.name order by count desc limit 100;", null);
 		
 		ArrayList<Friend> friendRanks = new ArrayList<Friend>();
 		while(friendRanksResults.moveToNext())

@@ -21,5 +21,7 @@
     <string name="bar_colours_preference_summary">Set the colour of the bars</string>
     <string name="show_all_bars">Show all bars</string>
     <string name="exclude_zero_photos_summary">Exclude photos with no likes</string>
+    <string name="profile_pic">Profile Pic</string>
+    <string name="no_ranks">No friend ranks to show</string>
 
 </resources>
