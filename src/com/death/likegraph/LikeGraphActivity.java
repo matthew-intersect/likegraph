@@ -90,6 +90,7 @@ public class LikeGraphActivity extends Activity
 	    posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
 				checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
 				sharedPrefs.getBoolean("exclude_zero_photos", true));
+	    Collections.sort(posts, new PostLikesComparator());
 	    CategorySeries series = new CategorySeries("");
 		for(int i=0;i<posts.size();i++)
 		{
