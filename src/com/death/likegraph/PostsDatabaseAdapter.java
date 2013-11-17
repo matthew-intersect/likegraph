@@ -30,7 +30,7 @@ public class PostsDatabaseAdapter
 	static final String PHOTOS_TABLE_CREATE = "create table photos" + 
 			"( id long primary key, time long, poster text, message text, source text); ";
 	static final String VIDEOS_TABLE_CREATE = "create table videos" + 
-			"( id long primary key, time long, poster text, name text, description text, source text); ";
+			"( id long primary key, time long, poster text, name text, description text, source text, picture text); ";
 	static final String LIKE_TABLE_CREATE = "create table likes" + 
 	        "( id integer primary key autoincrement, name text, post_id long); ";
 	static final String FRIENDS_TABLE_CREATE = "create table friends" +
@@ -106,7 +106,7 @@ public class PostsDatabaseAdapter
 		db.insert("photos", null, newValues);
 	}
 	
-	public void addVideo(long id, long time, String from, String name, String description, String source)
+	public void addVideo(long id, long time, String from, String name, String description, String source, String thumbnail)
 	{
 		ContentValues newValues = new ContentValues();
 		newValues.put("id", id);
@@ -115,6 +115,7 @@ public class PostsDatabaseAdapter
 		newValues.put("description", description);
 		newValues.put("source", source);
 		newValues.put("poster", from);
+		newValues.put("picture", thumbnail);
 	
 		db.insert("videos", null, newValues);
 	}
@@ -300,7 +301,7 @@ public class PostsDatabaseAdapter
 	public ArrayList<Post> getVideoCounts()
 	{
 		ArrayList<Post> videos = new ArrayList<Post>();
-		Cursor videoCounts = db.rawQuery("select videos.id, videos.time, videos.name, videos.description, videos.source, count(likes.id) as count from videos " +
+		Cursor videoCounts = db.rawQuery("select videos.id, videos.time, videos.name, videos.description, videos.source, videos.picture, count(likes.id) as count from videos " +
 				"left outer join likes on videos.id=likes.post_id group by videos.id order by videos.time desc;", null);
 		while(videoCounts.moveToNext())
 		{
@@ -309,8 +310,9 @@ public class PostsDatabaseAdapter
 			String name = videoCounts.getString(videoCounts.getColumnIndex("name"));
 			String description= videoCounts.getString(videoCounts.getColumnIndex("description"));
 			String source = videoCounts.getString(videoCounts.getColumnIndex("source"));
+			String picture = videoCounts.getString(videoCounts.getColumnIndex("picture"));
 			int count = videoCounts.getInt(videoCounts.getColumnIndex("count"));
-			videos.add(new Video(id, time, name, description, source, count));
+			videos.add(new Video(id, time, name, description, source, picture, count));
 		}
 		videoCounts.close();
 		return videos;

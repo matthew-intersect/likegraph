@@ -31,6 +31,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.util.Linkify;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -300,16 +301,76 @@ public class LikeGraphActivity extends Activity
 	
 	private void displayCheckin(Checkin checkin)
 	{
+		final Dialog dialog = new Dialog(LikeGraphActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.checkin_preview);
 		
+		TextView checkinPlace = (TextView) dialog.findViewById(R.id.checkin_place);
+		checkinPlace.setText(checkin.getLocation());
+		TextView checkinMessage = (TextView) dialog.findViewById(R.id.checkin_message);
+		checkinMessage.setText(checkin.getMessage());
+		
+		Button ok = (Button) dialog.findViewById(R.id.ok);
+		
+		ok.setOnClickListener(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v)
+			{
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
 	}
 	
 	private void displayLink(Link link)
 	{
+		final Dialog dialog = new Dialog(LikeGraphActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.link_preview);
 		
+		TextView linkText = (TextView) dialog.findViewById(R.id.link_text);
+		linkText.setText(link.getLink());
+		Linkify.addLinks(linkText, Linkify.ALL);
+		TextView linkMessageText = (TextView) dialog.findViewById(R.id.link_message_text);
+		linkMessageText.setText(link.getMessage());
+		
+		Button ok = (Button) dialog.findViewById(R.id.ok);
+		
+		ok.setOnClickListener(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v)
+			{
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
 	}
 	
 	private void displayVideo(Video video)
 	{
+		final Dialog dialog = new Dialog(LikeGraphActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.video_preview);
 		
+		TextView videoDescription = (TextView) dialog.findViewById(R.id.video_description);
+		videoDescription.setText(video.getDescription());
+		
+		ImageView videoThumbnail = (ImageView) dialog.findViewById(R.id.video_thumbnail);
+		videoThumbnail.setScaleType(ScaleType.CENTER_INSIDE);
+		new ImageLoader(videoThumbnail, video.getPicture()).execute();
+		
+		Button ok = (Button) dialog.findViewById(R.id.ok);
+		
+		ok.setOnClickListener(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v)
+			{
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
 	}
 }

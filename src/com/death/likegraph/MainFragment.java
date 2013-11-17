@@ -1,7 +1,6 @@
 package com.death.likegraph;
 
 import java.util.Arrays;
-
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
@@ -350,7 +349,7 @@ public class MainFragment extends Fragment
 			params.putInt("limit", 25);
 			params.putInt("offset", offset);
 			offset+=25;
-			params.putString("fields", "id,name,created_time,likes,source,from,description");
+			params.putString("fields", "id,name,created_time,likes,source,from,description,picture");
 			req.setParameters(params);
 			requestBatch.add(req);
 		}
@@ -587,7 +586,8 @@ public class MainFragment extends Fragment
 				long date = parser.parseDateTime(postedDate).getMillis();
 				String message = (item.has("name")) ? item.getString("name") : "";
 				String description = (item.has("description")) ? item.getString("description") : "";
-				postsDatabaseAdapter.addVideo(Long.parseLong(item.getString("id")), date, from.getString("name"), message, description, item.getString("source"));
+				String source = (item.has("source")) ? item.getString("source") : "";
+				postsDatabaseAdapter.addVideo(Long.parseLong(item.getString("id")), date, from.getString("name"), message, description, source, item.getString("picture"));
 				if(item.has("likes"))
 				{
 					JSONObject likeObject = (JSONObject) item.getJSONObject("likes");
