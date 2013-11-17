@@ -23,5 +23,7 @@
     <string name="exclude_zero_photos_summary">Exclude photos with no likes</string>
     <string name="profile_pic">Profile Pic</string>
     <string name="no_ranks">No friend ranks to show</string>
+    <string name="ok">OK</string>
+    <string name="image">image</string>
 
 </resources>

@@ -1,11 +1,17 @@
 package com.death.likegraph;
 
+import helpers.ImageLoader;
 import helpers.PostLikesComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import models.Post;
+import models.Status;
+import models.Photo;
+import models.Checkin;
+import models.Link;
+import models.Video;
 
 import org.achartengine.ChartFactory;
 import org.achartengine.GraphicalView;
@@ -19,6 +25,7 @@ import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -28,14 +35,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
 public class LikeGraphActivity extends Activity
 {
 	private PostsDatabaseAdapter postsDatabaseAdapter;
 	private SharedPreferences sharedPrefs;
+	
+	private ArrayList<Post> posts;
 	
 	private XYSeriesRenderer renderer;
 	private XYMultipleSeriesRenderer mRenderer;
@@ -73,7 +86,7 @@ public class LikeGraphActivity extends Activity
 	    checkPhotos.setChecked(sharedPrefs.getBoolean("checkPhotos", false));
 	    checkVideos.setChecked(sharedPrefs.getBoolean("checkVideos", false));
 	    
-	    ArrayList<Post> posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
+	    posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
 				checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
 				sharedPrefs.getBoolean("exclude_zero_photos", true));
 	    CategorySeries series = new CategorySeries("");
@@ -82,7 +95,7 @@ public class LikeGraphActivity extends Activity
 			series.add("", posts.get(i).getLikeCount());
 		}
 		dataset.addSeries(series.toXYSeries());
-		setupRenderers(posts, series.toXYSeries());
+		setupRenderers(series.toXYSeries());
         graph = ChartFactory.getBarChartView(getApplicationContext(), dataset, mRenderer, Type.DEFAULT);
         layout.addView(graph);
         
@@ -94,9 +107,27 @@ public class LikeGraphActivity extends Activity
         		SeriesSelection seriesSelection = ((GraphicalView) graph).getCurrentSeriesAndPoint();
         		if(seriesSelection != null)
         		{
-        			Toast.makeText(getApplicationContext(), "Chart element in series index " + seriesSelection.getSeriesIndex()
-        					+ " data point index " + seriesSelection.getPointIndex() + " was clicked"
-        					+ " closest point value X=" + seriesSelection.getXValue() + ", Y=" + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
+        			if(posts.get((int) seriesSelection.getXValue()-1) instanceof Status)
+        			{
+        				displayStatus(((Status) posts.get((int) seriesSelection.getXValue()-1)));
+        			}
+        			else if(posts.get((int) seriesSelection.getXValue()-1) instanceof Photo)
+        			{
+        				displayPhoto(((Photo) posts.get((int) seriesSelection.getXValue()-1)));
+        			}
+        			else if(posts.get((int) seriesSelection.getXValue()-1) instanceof Checkin)
+        			{
+        				displayCheckin(((Checkin) posts.get((int) seriesSelection.getXValue()-1)));
+        			}
+        			else if(posts.get((int) seriesSelection.getXValue()-1) instanceof Link)
+        			{
+        				displayLink(((Link) posts.get((int) seriesSelection.getXValue()-1)));
+        			}
+        			else if(posts.get((int) seriesSelection.getXValue()-1) instanceof Video)
+        			{
+        				displayVideo(((Video) posts.get((int) seriesSelection.getXValue()-1)));
+        			}
+        			
         		}
         		return false;
         	}
@@ -108,7 +139,7 @@ public class LikeGraphActivity extends Activity
 			public void onClick(View v)
 			{
 				updateCheckPreferences();
-				ArrayList<Post> posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
+				posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
 						checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
 						sharedPrefs.getBoolean("exclude_zero_photos", true));
 				Collections.sort(posts, new PostLikesComparator());
@@ -119,7 +150,7 @@ public class LikeGraphActivity extends Activity
 				}
 				dataset.removeSeries(0);
 				dataset.addSeries(series.toXYSeries());
-				setupRenderers(posts, series.toXYSeries());
+				setupRenderers(series.toXYSeries());
 				((GraphicalView) graph).repaint();
 			}
 		};
@@ -155,7 +186,7 @@ public class LikeGraphActivity extends Activity
 		return false;
 	}
 	
-	private void setupRenderers(ArrayList<Post> posts, XYSeries series)
+	private void setupRenderers(XYSeries series)
 	{
 		renderer.setColor(getColour(sharedPrefs.getString("graph_bar_colour", "Blue")));
 		mRenderer.removeAllRenderers();
@@ -217,5 +248,68 @@ public class LikeGraphActivity extends Activity
 		{
 			return Color.BLUE;
 		}
+	}
+
+	private void displayStatus(Status status)
+	{
+		final Dialog dialog = new Dialog(LikeGraphActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.status_preview);
+		
+		TextView statusText = (TextView) dialog.findViewById(R.id.status_text);
+		statusText.setText(status.getStatus());
+		
+		Button ok = (Button) dialog.findViewById(R.id.ok);
+		
+		ok.setOnClickListener(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v)
+			{
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
+	}
+	
+	private void displayPhoto(Photo photo)
+	{
+		final Dialog dialog = new Dialog(LikeGraphActivity.this);
+		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		dialog.setContentView(R.layout.photo_preview);
+		
+		TextView photoText = (TextView) dialog.findViewById(R.id.photo_text);
+		photoText.setText(photo.getMessage());
+		
+		ImageView image = (ImageView) dialog.findViewById(R.id.image);
+		image.setScaleType(ScaleType.CENTER_INSIDE);
+		new ImageLoader(image, photo.getSource()).execute();
+		
+		Button ok = (Button) dialog.findViewById(R.id.ok);
+		
+		ok.setOnClickListener(new View.OnClickListener() 
+		{
+			@Override
+			public void onClick(View v)
+			{
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
+	}
+	
+	private void displayCheckin(Checkin checkin)
+	{
+		
+	}
+	
+	private void displayLink(Link link)
+	{
+		
+	}
+	
+	private void displayVideo(Video video)
+	{
+		
 	}
 }
