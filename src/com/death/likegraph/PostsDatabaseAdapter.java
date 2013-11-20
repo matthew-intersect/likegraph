@@ -320,7 +320,7 @@ public class PostsDatabaseAdapter
 
 	public ArrayList<Friend> getAllFriends()
 	{
-		Cursor friendsCursor = db.query("friends", null, null, null, null, null, null);
+		Cursor friendsCursor = db.query("friends", null, null, null, null, null, "name asc");
 		
 		ArrayList<Friend> friends = new ArrayList<Friend>();
 		while(friendsCursor.moveToNext())
@@ -336,7 +336,7 @@ public class PostsDatabaseAdapter
 	
 	public ArrayList<Friend> searchFriends(String name)
 	{
-		Cursor friendsCursor = db.query("friends", null, "name LIKE?", new String[] { "%" + name + "%" }, null, null, null);
+		Cursor friendsCursor = db.query("friends", null, "name LIKE?", new String[] { "%" + name + "%" }, null, null, "name asc");
 		
 		ArrayList<Friend> friends = new ArrayList<Friend>();
 		while(friendsCursor.moveToNext())
