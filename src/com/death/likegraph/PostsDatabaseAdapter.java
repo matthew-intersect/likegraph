@@ -317,4 +317,36 @@ public class PostsDatabaseAdapter
 		videoCounts.close();
 		return videos;
 	}
+
+	public ArrayList<Friend> getAllFriends()
+	{
+		Cursor friendsCursor = db.query("friends", null, null, null, null, null, null);
+		
+		ArrayList<Friend> friends = new ArrayList<Friend>();
+		while(friendsCursor.moveToNext())
+		{
+			long id = friendsCursor.getLong(friendsCursor.getColumnIndex("id"));
+			String name = friendsCursor.getString(friendsCursor.getColumnIndex("name"));
+			String picture = friendsCursor.getString(friendsCursor.getColumnIndex("picture"));
+			friends.add(new Friend(id, name, picture, 0));
+		}
+		
+		return friends;
+	}
+	
+	public ArrayList<Friend> searchFriends(String name)
+	{
+		Cursor friendsCursor = db.query("friends", null, "name LIKE?", new String[] { "%" + name + "%" }, null, null, null);
+		
+		ArrayList<Friend> friends = new ArrayList<Friend>();
+		while(friendsCursor.moveToNext())
+		{
+			long id = friendsCursor.getLong(friendsCursor.getColumnIndex("id"));
+			String friendName = friendsCursor.getString(friendsCursor.getColumnIndex("name"));
+			String picture = friendsCursor.getString(friendsCursor.getColumnIndex("picture"));
+			friends.add(new Friend(id, friendName, picture, 0));
+		}
+		
+		return friends;
+	}
 }

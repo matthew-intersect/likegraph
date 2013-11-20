@@ -7,6 +7,7 @@
     <string name="fetch_data">Fetch Data</string>
     <string name="create_graph">Create Graph</string>
     <string name="rank_friends">Rank Friends</string>
+    <string name="search_friends">Search Friends</string>
     <string name="generate">Generate Graph</string>
     <string name="statuses">Statuses</string>
     <string name="links">Links</string>
@@ -23,7 +24,9 @@
     <string name="exclude_zero_photos_summary">Exclude photos with no likes</string>
     <string name="profile_pic">Profile Pic</string>
     <string name="no_ranks">No friend ranks to show</string>
+    <string name="no_friends">No friends to show</string>
     <string name="ok">OK</string>
     <string name="image">image</string>
+    <string name="search_hint">Name</string>
 
 </resources>

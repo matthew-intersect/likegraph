@@ -35,7 +35,7 @@ public class MainFragment extends Fragment
 	int offset = 0;
 	
 	private ProgressDialog dialog;
-	private Button fetchData, createGraph, rankFriends;
+	private Button fetchData, createGraph, rankFriends, searchFriends;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -60,6 +60,7 @@ public class MainFragment extends Fragment
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    rankFriends = (Button) view.findViewById(R.id.rankFriends);
+	    searchFriends = (Button) view.findViewById(R.id.searchFriends);
 	    authButton.setFragment(this);
 	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins", "user_photos", "user_videos"));
 	    
@@ -93,6 +94,16 @@ public class MainFragment extends Fragment
 			{
 				Intent rank = new Intent(v.getContext(), RankFriendsActivity.class);
 				startActivity(rank);
+			}
+		});
+	    
+	    searchFriends.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Intent searchFriends = new Intent(v.getContext(), SearchFriendsActivity.class);
+				startActivity(searchFriends);
 			}
 		});
 	    
@@ -160,6 +171,7 @@ public class MainFragment extends Fragment
 	    	fetchData.setVisibility(View.VISIBLE);
 	    	createGraph.setVisibility(View.VISIBLE);
 	    	rankFriends.setVisibility(View.VISIBLE);
+	    	searchFriends.setVisibility(View.VISIBLE);
 	    }
 	    else if (state.isClosed())
 	    {
@@ -167,6 +179,7 @@ public class MainFragment extends Fragment
 	        fetchData.setVisibility(View.INVISIBLE);
 	        createGraph.setVisibility(View.INVISIBLE);
 	        rankFriends.setVisibility(View.INVISIBLE);
+	        searchFriends.setVisibility(View.INVISIBLE);
 	    }
 	}
 	
