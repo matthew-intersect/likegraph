@@ -349,4 +349,14 @@ public class PostsDatabaseAdapter
 		
 		return friends;
 	}
+
+	public Friend getFriend(long friendId)
+	{
+		Cursor friend = db.query("friends", null, "id=?", new String[]{String.valueOf(friendId)}, null, null, null);
+		friend.moveToFirst();
+		long id = friend.getLong(friend.getColumnIndex("id"));
+		String name = friend.getString(friend.getColumnIndex("name"));
+		String picture = friend.getString(friend.getColumnIndex("picture"));
+		return new Friend(id, name, picture, 0);
+	}
 }

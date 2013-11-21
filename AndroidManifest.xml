@@ -32,6 +32,7 @@
             android:parentActivityName="com.death.likegraph.MainActivity"></activity>
         <activity android:name="com.death.likegraph.SearchFriendsActivity"
             android:parentActivityName="com.death.likegraph.MainActivity"></activity>
+        <activity android:name="com.death.likegraph.ViewFriendActivity"></activity>
     </application>
 
 </manifest>

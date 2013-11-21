@@ -25,6 +25,7 @@
     <string name="profile_pic">Profile Pic</string>
     <string name="no_ranks">No friend ranks to show</string>
     <string name="no_friends">No friends to show</string>
+    <string name="no_statuses">No statuses liked</string>
     <string name="ok">OK</string>
     <string name="image">image</string>
     <string name="search_hint">Name</string>

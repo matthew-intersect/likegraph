@@ -3,6 +3,8 @@ package helpers;
 import java.io.InputStream;
 import java.net.URL;
 
+import com.death.likegraph.R;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -18,6 +20,12 @@ public class ImageLoader extends AsyncTask<Void, Void, Bitmap>
         this.image = image;
         this.source = source;
 	}
+	
+	@Override
+    protected void onPreExecute()
+	{
+		image.setImageResource(R.drawable.com_facebook_profile_picture_blank_portrait);
+    }
 	
 	@Override
 	protected Bitmap doInBackground(Void... args)

@@ -8,12 +8,14 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 
 public class SearchFriendsActivity extends ListActivity
 {
@@ -31,7 +33,6 @@ public class SearchFriendsActivity extends ListActivity
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowCustomEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
-//		actionBar.setIcon(R.drawable.ic_action_search);
 		
 		LayoutInflater inflator = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View v = inflator.inflate(R.layout.search_friends_action_bar, null);
@@ -65,5 +66,12 @@ public class SearchFriendsActivity extends ListActivity
 			{
 			}
 		});
+	}
+	
+	public void onListItemClick(ListView l, View v, int pos, long id)
+	{
+		Intent friend = new Intent(SearchFriendsActivity.this, ViewFriendActivity.class);
+		friend.putExtra("friend_id", friends.get(pos).getId());
+		startActivity(friend);
 	}
 }
