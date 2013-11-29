@@ -388,7 +388,7 @@ public class MainFragment extends Fragment
 	public void fetchFriends()
 	{
 		dialog.setMessage("Fetching friends...");
-		String fqlQuery = "SELECT uid, name, pic FROM user WHERE uid IN " +
+		String fqlQuery = "SELECT uid, name, pic_big FROM user WHERE uid IN " +
 	              "(SELECT uid2 FROM friend WHERE uid1 = me())";
 		Bundle params = new Bundle();
         params.putString("q", fqlQuery);
@@ -407,7 +407,7 @@ public class MainFragment extends Fragment
         				item = (JSONObject) friendsData.get(i);
         				long id = Long.parseLong(item.getString("uid"));
         				String name = item.getString("name");
-        				String link = item.getString("pic");
+        				String link = item.getString("pic_big");
         				postsDatabaseAdapter.addFriend(id, name, link);
         			}
         			catch (JSONException e)

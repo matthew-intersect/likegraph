@@ -19,16 +19,16 @@ public class ViewFriendActivity extends ListActivity
 		setContentView(R.layout.view_friend);
 		
 		postsDatabaseAdapter = new PostsDatabaseAdapter(this);
-	    postsDatabaseAdapter = postsDatabaseAdapter.open();
+		postsDatabaseAdapter = postsDatabaseAdapter.open();
 		
 		Bundle extras = getIntent().getExtras();
-	    long friendId = extras.getLong("friend_id");
-	    friend = postsDatabaseAdapter.getFriend(friendId);
-	    
-	    TextView name = (TextView) findViewById(R.id.friend_name);
-	    ImageView picture = (ImageView) findViewById(R.id.friend_picture);
-	    
-	    name.setText(friend.getName());
-	    new ImageLoader(picture, friend.getPicture()).execute();
+		long friendId = extras.getLong("friend_id");
+		friend = postsDatabaseAdapter.getFriend(friendId);
+		
+		TextView name = (TextView) findViewById(R.id.friend_name);
+		ImageView picture = (ImageView) findViewById(R.id.friend_picture);
+		
+		name.setText(friend.getName());
+		new ImageLoader(picture, friend.getPicture()).execute();
 	}
 }
