@@ -1,7 +1,10 @@
 package com.death.likegraph;
 
+import java.util.ArrayList;
+
 import helpers.ImageLoader;
 import models.Friend;
+import models.Status;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -11,6 +14,7 @@ public class ViewFriendActivity extends ListActivity
 {
 	private PostsDatabaseAdapter postsDatabaseAdapter;
 	private Friend friend;
+	private ArrayList<Status> statuses;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -24,6 +28,10 @@ public class ViewFriendActivity extends ListActivity
 		Bundle extras = getIntent().getExtras();
 		long friendId = extras.getLong("friend_id");
 		friend = postsDatabaseAdapter.getFriend(friendId);
+		statuses = postsDatabaseAdapter.getLikedStatusesByFriend(friend.getId());
+		
+		final StatusAdapter statusesAdapter = new StatusAdapter(getApplicationContext(), statuses);
+		setListAdapter(statusesAdapter);
 		
 		TextView name = (TextView) findViewById(R.id.friend_name);
 		ImageView picture = (ImageView) findViewById(R.id.friend_picture);

@@ -359,4 +359,20 @@ public class PostsDatabaseAdapter
 		String picture = friend.getString(friend.getColumnIndex("picture"));
 		return new Friend(id, name, picture, 0);
 	}
+
+	public ArrayList<Status> getLikedStatusesByFriend(long friendId)
+	{
+		ArrayList<Status> statuses = new ArrayList<Status>();
+		Cursor statusCursor = db.rawQuery("select statii.id, statii.time, statii.status from statii " +
+				"left outer join likes on statii.id=likes.post_id inner join friends on likes.name=friends.name where friends.id=" + 
+				friendId + ";", null);
+		while(statusCursor.moveToNext())
+		{
+			long id = statusCursor.getLong(statusCursor.getColumnIndex("id"));
+			long time = statusCursor.getLong(statusCursor.getColumnIndex("time"));
+			String status = statusCursor.getString(statusCursor.getColumnIndex("status"));
+			statuses.add(new Status(id, time, status, 0));
+		}
+		return statuses;
+	}
 }
