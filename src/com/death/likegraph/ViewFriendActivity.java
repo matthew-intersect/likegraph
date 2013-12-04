@@ -7,7 +7,9 @@ import models.Friend;
 import models.Status;
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class ViewFriendActivity extends ListActivity
@@ -38,5 +40,10 @@ public class ViewFriendActivity extends ListActivity
 		
 		name.setText(friend.getName());
 		new ImageLoader(picture, friend.getPicture()).execute();
+	}
+	
+	public void onListItemClick(ListView l, View v, int pos, long id)
+	{
+		new StatusDialog(ViewFriendActivity.this, statuses.get(pos)).show();
 	}
 }

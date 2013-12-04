@@ -254,24 +254,7 @@ public class LikeGraphActivity extends Activity
 
 	private void displayStatus(Status status)
 	{
-		final Dialog dialog = new Dialog(LikeGraphActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.status_preview);
-		
-		TextView statusText = (TextView) dialog.findViewById(R.id.status_text);
-		statusText.setText(status.getStatus());
-		
-		Button ok = (Button) dialog.findViewById(R.id.ok);
-		
-		ok.setOnClickListener(new View.OnClickListener() 
-		{
-			@Override
-			public void onClick(View v)
-			{
-				dialog.dismiss();
-			}
-		});
-		dialog.show();
+		new StatusDialog(LikeGraphActivity.this, status).show();
 	}
 	
 	private void displayPhoto(Photo photo)
