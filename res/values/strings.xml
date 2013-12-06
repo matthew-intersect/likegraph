@@ -29,5 +29,6 @@
     <string name="ok">OK</string>
     <string name="image">image</string>
     <string name="search_hint">Name</string>
+    <string name="profile">Profile</string>
 
 </resources>

@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/fetch_data"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
+        android:visibility="gone"
         />
     
     <Button
@@ -20,7 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/create_graph"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
         />
     
     <Button
@@ -29,7 +31,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/rank_friends"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
         />
     
     <Button
@@ -38,7 +41,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/search_friends"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
+        />
+    
+    <Button
+        android:id="@+id/profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/profile"
+        android:layout_marginTop="15dp"
+        android:visibility="gone"
         />
     
     <com.facebook.widget.LoginButton

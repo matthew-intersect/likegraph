@@ -19,7 +19,9 @@ import com.facebook.widget.LoginButton;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,7 +37,7 @@ public class MainFragment extends Fragment
 	int offset = 0;
 	
 	private ProgressDialog dialog;
-	private Button fetchData, createGraph, rankFriends, searchFriends;
+	private Button fetchData, createGraph, rankFriends, searchFriends, profile;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -61,6 +63,7 @@ public class MainFragment extends Fragment
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
 	    rankFriends = (Button) view.findViewById(R.id.rankFriends);
 	    searchFriends = (Button) view.findViewById(R.id.searchFriends);
+	    profile = (Button) view.findViewById(R.id.profile);
 	    authButton.setFragment(this);
 	    authButton.setReadPermissions(Arrays.asList("read_stream", "user_status", "user_checkins", "user_photos", "user_videos"));
 	    
@@ -104,6 +107,16 @@ public class MainFragment extends Fragment
 			{
 				Intent searchFriends = new Intent(v.getContext(), SearchFriendsActivity.class);
 				startActivity(searchFriends);
+			}
+		});
+	    
+	    profile.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				Intent userProfile = new Intent(v.getContext(), ProfileActivity.class);
+				startActivity(userProfile);
 			}
 		});
 	    
@@ -172,14 +185,16 @@ public class MainFragment extends Fragment
 	    	createGraph.setVisibility(View.VISIBLE);
 	    	rankFriends.setVisibility(View.VISIBLE);
 	    	searchFriends.setVisibility(View.VISIBLE);
+	    	profile.setVisibility(View.VISIBLE);
 	    }
 	    else if (state.isClosed())
 	    {
 	        Log.i(TAG, "Logged out...");
-	        fetchData.setVisibility(View.INVISIBLE);
-	        createGraph.setVisibility(View.INVISIBLE);
-	        rankFriends.setVisibility(View.INVISIBLE);
-	        searchFriends.setVisibility(View.INVISIBLE);
+	        fetchData.setVisibility(View.GONE);
+	        createGraph.setVisibility(View.GONE);
+	        rankFriends.setVisibility(View.GONE);
+	        searchFriends.setVisibility(View.GONE);
+	        profile.setVisibility(View.GONE);
 	    }
 	}
 	
@@ -415,9 +430,44 @@ public class MainFragment extends Fragment
         				e.printStackTrace();
         			}
         		}
-                dialog.dismiss();
+        		fetchProfileInfo();
             }                  
     	});
+        Request.executeBatchAsync(request);
+	}
+	
+	public void fetchProfileInfo()
+	{
+		String query = "SELECT uid, name, pic_big FROM user WHERE uid = me()";
+		Bundle params = new Bundle();
+        params.putString("q", query);
+        Request request = new Request(Session.getActiveSession(), "/fql", params,
+        		HttpMethod.GET, new Request.Callback()
+        {         
+            public void onCompleted(Response response)
+            {
+            	GraphObject data = response.getGraphObject();
+            	JSONArray profileData = (JSONArray) data.getProperty("data");
+            	JSONObject item;
+    			try
+    			{
+    				item = profileData.getJSONObject(0);
+    				long id = Long.parseLong(item.getString("uid"));
+    				String name = item.getString("name");
+    				String link = item.getString("pic_big");
+    				SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+    				sharedPrefs.edit().putLong("global_user_id", id).commit();
+    				sharedPrefs.edit().putString("global_user_name", name).commit();
+    				sharedPrefs.edit().putString("global_user_pic", link).commit();
+    				
+    			}
+    			catch (JSONException e)
+    			{
+    				e.printStackTrace();
+    			}
+    			dialog.dismiss();
+            }
+        });
         Request.executeBatchAsync(request);
 	}
 	
