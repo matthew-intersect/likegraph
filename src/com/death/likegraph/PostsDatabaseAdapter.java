@@ -375,4 +375,18 @@ public class PostsDatabaseAdapter
 		}
 		return statuses;
 	}
+	
+	public int getTotalLikes()
+	{
+		Cursor count = db.query("likes", new String[] {"count(*) as count"}, null, null, null, null, null);
+		count.moveToFirst();
+		return count.getInt(count.getColumnIndex("count"));
+	}
+	
+	public int getTotalUniqueLikes()
+	{
+		Cursor count = db.rawQuery("select count(*) as count from (select * from likes group by name);", null);
+		count.moveToFirst();
+		return count.getInt(count.getColumnIndex("count"));
+	}
 }
