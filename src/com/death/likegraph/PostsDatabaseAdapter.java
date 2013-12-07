@@ -389,4 +389,18 @@ public class PostsDatabaseAdapter
 		count.moveToFirst();
 		return count.getInt(count.getColumnIndex("count"));
 	}
+	
+	public int getTopPostCount()
+	{
+		Cursor count = db.query("likes", new String[] {"count(id) as count"}, null, null, "post_id", null, "count desc");
+		count.moveToFirst();
+		return count.getInt(count.getColumnIndex("count"));
+	}
+	
+	public int getUserLikes(String name)
+	{
+		Cursor count = db.query("likes", new String[] {"count(*) as count"}, "name=?", new String[] {name}, null, null, null);
+		count.moveToFirst();
+		return count.getInt(count.getColumnIndex("count"));
+	}
 }

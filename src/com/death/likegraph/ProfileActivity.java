@@ -14,7 +14,7 @@ public class ProfileActivity extends Activity
 	private PostsDatabaseAdapter postsDatabaseAdapter;
 	private SharedPreferences sharedPrefs;
 	
-	private TextView name, totalLikes, uniqueLikes;
+	private TextView name, totalLikes, uniqueLikes, topPost, selfLikes;
 	private ImageView picture;
 	
 	@SuppressLint("NewApi")
@@ -33,10 +33,14 @@ public class ProfileActivity extends Activity
 	    picture = (ImageView) findViewById(R.id.user_picture);
 	    totalLikes = (TextView) findViewById(R.id.total_likes);
 	    uniqueLikes = (TextView) findViewById(R.id.unique_likes);
+	    topPost = (TextView) findViewById(R.id.top_post);
+	    selfLikes = (TextView) findViewById(R.id.self_likes);
 	    
 	    name.setText(sharedPrefs.getString("global_user_name", "F"));
 	    totalLikes.setText("Total likes received: " + postsDatabaseAdapter.getTotalLikes());
 	    uniqueLikes.setText("Unique likes received: " + postsDatabaseAdapter.getTotalUniqueLikes());
+	    topPost.setText("Most likes received for a post: " + postsDatabaseAdapter.getTopPostCount());
+	    selfLikes.setText("Self Likes (Vanity count): " + postsDatabaseAdapter.getUserLikes(sharedPrefs.getString("global_user_name", "")));
 	    new ImageLoader(picture, sharedPrefs.getString("global_user_pic", "")).execute();
 	}
 
