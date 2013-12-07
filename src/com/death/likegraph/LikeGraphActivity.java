@@ -268,7 +268,7 @@ public class LikeGraphActivity extends Activity
 		
 		ImageView image = (ImageView) dialog.findViewById(R.id.image);
 		image.setScaleType(ScaleType.CENTER_INSIDE);
-		new ImageLoader(image, photo.getSource()).execute();
+		new ImageLoader(image, photo.getSource(), 0).execute();
 		
 		Button ok = (Button) dialog.findViewById(R.id.ok);
 		
@@ -343,7 +343,7 @@ public class LikeGraphActivity extends Activity
 		
 		ImageView videoThumbnail = (ImageView) dialog.findViewById(R.id.video_thumbnail);
 		videoThumbnail.setScaleType(ScaleType.CENTER_INSIDE);
-		new ImageLoader(videoThumbnail, video.getPicture()).execute();
+		new ImageLoader(videoThumbnail, video.getPicture(), 0).execute();
 		
 		Button ok = (Button) dialog.findViewById(R.id.ok);
 		

@@ -41,7 +41,7 @@ public class ProfileActivity extends Activity
 	    uniqueLikes.setText("Unique likes received: " + postsDatabaseAdapter.getTotalUniqueLikes());
 	    topPost.setText("Most likes received for a post: " + postsDatabaseAdapter.getTopPostCount());
 	    selfLikes.setText("Self Likes (Vanity count): " + postsDatabaseAdapter.getUserLikes(sharedPrefs.getString("global_user_name", "")));
-	    new ImageLoader(picture, sharedPrefs.getString("global_user_pic", "")).execute();
+	    new ImageLoader(picture, sharedPrefs.getString("global_user_pic", ""), R.drawable.com_facebook_profile_picture_blank_portrait).execute();
 	}
 
 }

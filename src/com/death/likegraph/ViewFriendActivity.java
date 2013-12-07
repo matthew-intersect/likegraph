@@ -39,7 +39,7 @@ public class ViewFriendActivity extends ListActivity
 		ImageView picture = (ImageView) findViewById(R.id.friend_picture);
 		
 		name.setText(friend.getName());
-		new ImageLoader(picture, friend.getPicture()).execute();
+		new ImageLoader(picture, friend.getPicture(), R.drawable.com_facebook_profile_picture_blank_portrait).execute();
 	}
 	
 	public void onListItemClick(ListView l, View v, int pos, long id)
