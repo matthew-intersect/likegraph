@@ -390,11 +390,15 @@ public class PostsDatabaseAdapter
 		return count.getInt(count.getColumnIndex("count"));
 	}
 	
-	public int getTopPostCount()
+	public Post getTopPost()
 	{
-		Cursor count = db.query("likes", new String[] {"count(id) as count"}, null, null, "post_id", null, "count desc");
+		Cursor count = db.query("likes", new String[] {"post_id, count(id) as count"}, null, null, "post_id", null, "count desc");
 		count.moveToFirst();
-		return count.getInt(count.getColumnIndex("count"));
+		int likeCount = count.getInt(count.getColumnIndex("count"));
+		long postId = count.getLong(count.getColumnIndex("post_id"));
+		Post post = getPostById(postId);
+		post.setLikeCount(likeCount);
+		return post;
 	}
 	
 	public int getUserLikes(String name)
@@ -402,5 +406,63 @@ public class PostsDatabaseAdapter
 		Cursor count = db.query("likes", new String[] {"count(*) as count"}, "name=?", new String[] {name}, null, null, null);
 		count.moveToFirst();
 		return count.getInt(count.getColumnIndex("count"));
+	}
+	
+	public Post getPostById(long id)
+	{
+		String postId = String.valueOf(id);
+		Cursor table = db.rawQuery("select case when exists(select 1 from statii where id=?) then 'statii' when exists(" +
+				"select 1 from links where id=?) then 'links' when exists(select 1 from checkins where id=?) then 'checkins' " +
+				"when exists(select 1 from photos where id=?) then 'photos' when exists(select 1 from videos where id=?) then " +
+				"'videos' end as 'none'", new String[] {postId, postId, postId, postId, postId});
+		table.moveToFirst();
+		String type = table.getString(0);
+		if(type.equals("statii"))
+		{
+			Cursor status = db.query("statii", null, "id=?", new String[] {postId}, null, null, null);
+			status.moveToFirst();
+			long time = status.getLong(status.getColumnIndex("time"));
+			String statusContent = status.getString(status.getColumnIndex("status"));
+			return new Status(id, time, statusContent, 0);
+		}
+		else if(type.equals("links"))
+		{
+			Cursor link = db.query("links", null, "id=?", new String[] {postId}, null, null, null);
+			link.moveToFirst();
+			long time = link.getLong(link.getColumnIndex("time"));
+			String message = link.getString(link.getColumnIndex("message"));
+			String linkText = link.getString(link.getColumnIndex("link"));
+			return new Link(id, time, message, linkText, 0);
+		}
+		else if(type.equals("checkins"))
+		{
+			Cursor checkin = db.query("checkins", null, "id=?", new String[] {postId}, null, null, null);
+			checkin.moveToFirst();
+			long time = checkin.getLong(checkin.getColumnIndex("time"));
+			String message = checkin.getString(checkin.getColumnIndex("message"));
+			String location = checkin.getString(checkin.getColumnIndex("location"));
+			return new Checkin(id, time, message, location, 0);
+		}
+		else if(type.equals("photos"))
+		{
+			Cursor photo = db.query("photos", null, "id=?", new String[] {postId}, null, null, null);
+			photo.moveToFirst();
+			long time = photo.getLong(photo.getColumnIndex("time"));
+			String message = photo.getString(photo.getColumnIndex("message"));
+			String source = photo.getString(photo.getColumnIndex("source"));
+			return new Photo(id, time, message, source, 0);
+		}
+		else if(type.equals("videos"))
+		{
+			Cursor video = db.query("videos", null, "id=?", new String[] {postId}, null, null, null);
+			video.moveToFirst();
+			long time = video.getLong(video.getColumnIndex("time"));
+			String name = video.getString(video.getColumnIndex("name"));
+			String description= video.getString(video.getColumnIndex("description"));
+			String source = video.getString(video.getColumnIndex("source"));
+			String picture = video.getString(video.getColumnIndex("picture"));
+			return new Video(id, time, name, description, source, picture, 0);
+		}
+		return null;
 	}
 }
