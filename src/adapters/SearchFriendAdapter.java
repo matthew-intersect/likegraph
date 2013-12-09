@@ -1,6 +1,8 @@
-package com.death.likegraph;
+package adapters;
 
 import java.util.ArrayList;
+
+import com.death.likegraph.R;
 
 import models.Friend;
 import android.content.Context;
