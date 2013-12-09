@@ -2,6 +2,7 @@ package com.death.likegraph;
 
 import java.util.ArrayList;
 
+import adapters.FriendRankAdapter;
 import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.os.Bundle;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import models.Friend;
 
+import adapters.SearchFriendAdapter;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ListActivity;

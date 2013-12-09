@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import helpers.ImageLoader;
 import models.Friend;
 import models.Status;
+import adapters.StatusAdapter;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
