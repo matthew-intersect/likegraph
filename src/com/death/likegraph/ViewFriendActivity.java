@@ -3,6 +3,7 @@ package com.death.likegraph;
 import java.util.ArrayList;
 
 import helpers.ImageLoader;
+import helpers.StatusDialog;
 import models.Friend;
 import models.Status;
 import adapters.StatusAdapter;
@@ -38,8 +39,10 @@ public class ViewFriendActivity extends ListActivity
 		
 		TextView name = (TextView) findViewById(R.id.friend_name);
 		ImageView picture = (ImageView) findViewById(R.id.friend_picture);
+		TextView likes = (TextView) findViewById(R.id.friend_likecount);
 		
 		name.setText(friend.getName());
+		likes.setText("Posts of yours liked: " + postsDatabaseAdapter.getUserLikes(friend.getName()));
 		new ImageLoader(picture, friend.getPicture(), R.drawable.com_facebook_profile_picture_blank_portrait).execute();
 	}
 	

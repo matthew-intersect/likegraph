@@ -1,7 +1,11 @@
 package com.death.likegraph;
 
-import helpers.ImageLoader;
+import helpers.CheckinDialog;
+import helpers.LinkDialog;
+import helpers.PhotoDialog;
 import helpers.PostLikesComparator;
+import helpers.StatusDialog;
+import helpers.VideoDialog;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,24 +29,17 @@ import org.achartengine.renderer.XYSeriesRenderer;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.util.Linkify;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 public class LikeGraphActivity extends Activity
 {
@@ -259,102 +256,21 @@ public class LikeGraphActivity extends Activity
 	
 	private void displayPhoto(Photo photo)
 	{
-		final Dialog dialog = new Dialog(LikeGraphActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.photo_preview);
-		
-		TextView photoText = (TextView) dialog.findViewById(R.id.photo_text);
-		photoText.setText(photo.getMessage());
-		
-		ImageView image = (ImageView) dialog.findViewById(R.id.image);
-		image.setScaleType(ScaleType.CENTER_INSIDE);
-		new ImageLoader(image, photo.getSource(), 0).execute();
-		
-		Button ok = (Button) dialog.findViewById(R.id.ok);
-		
-		ok.setOnClickListener(new View.OnClickListener() 
-		{
-			@Override
-			public void onClick(View v)
-			{
-				dialog.dismiss();
-			}
-		});
-		dialog.show();
+		new PhotoDialog(LikeGraphActivity.this, photo).show();
 	}
 	
 	private void displayCheckin(Checkin checkin)
 	{
-		final Dialog dialog = new Dialog(LikeGraphActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.checkin_preview);
-		
-		TextView checkinPlace = (TextView) dialog.findViewById(R.id.checkin_place);
-		checkinPlace.setText(checkin.getLocation());
-		TextView checkinMessage = (TextView) dialog.findViewById(R.id.checkin_message);
-		checkinMessage.setText(checkin.getMessage());
-		
-		Button ok = (Button) dialog.findViewById(R.id.ok);
-		
-		ok.setOnClickListener(new View.OnClickListener() 
-		{
-			@Override
-			public void onClick(View v)
-			{
-				dialog.dismiss();
-			}
-		});
-		dialog.show();
+		new CheckinDialog(LikeGraphActivity.this, checkin).show();
 	}
 	
 	private void displayLink(Link link)
 	{
-		final Dialog dialog = new Dialog(LikeGraphActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.link_preview);
-		
-		TextView linkText = (TextView) dialog.findViewById(R.id.link_text);
-		linkText.setText(link.getLink());
-		Linkify.addLinks(linkText, Linkify.ALL);
-		TextView linkMessageText = (TextView) dialog.findViewById(R.id.link_message_text);
-		linkMessageText.setText(link.getMessage());
-		
-		Button ok = (Button) dialog.findViewById(R.id.ok);
-		
-		ok.setOnClickListener(new View.OnClickListener() 
-		{
-			@Override
-			public void onClick(View v)
-			{
-				dialog.dismiss();
-			}
-		});
-		dialog.show();
+		new LinkDialog(LikeGraphActivity.this, link).show();
 	}
 	
 	private void displayVideo(Video video)
 	{
-		final Dialog dialog = new Dialog(LikeGraphActivity.this);
-		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		dialog.setContentView(R.layout.video_preview);
-		
-		TextView videoDescription = (TextView) dialog.findViewById(R.id.video_description);
-		videoDescription.setText(video.getDescription());
-		
-		ImageView videoThumbnail = (ImageView) dialog.findViewById(R.id.video_thumbnail);
-		videoThumbnail.setScaleType(ScaleType.CENTER_INSIDE);
-		new ImageLoader(videoThumbnail, video.getPicture(), 0).execute();
-		
-		Button ok = (Button) dialog.findViewById(R.id.ok);
-		
-		ok.setOnClickListener(new View.OnClickListener() 
-		{
-			@Override
-			public void onClick(View v)
-			{
-				dialog.dismiss();
-			}
-		});
-		dialog.show();
+		new VideoDialog(LikeGraphActivity.this, video).show();
 	}
 }

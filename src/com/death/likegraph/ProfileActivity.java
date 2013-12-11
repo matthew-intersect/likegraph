@@ -2,7 +2,16 @@ package com.death.likegraph;
 
 import models.Post;
 import models.Status;
+import models.Photo;
+import models.Link;
+import models.Checkin;
+import models.Video;
+import helpers.CheckinDialog;
 import helpers.ImageLoader;
+import helpers.LinkDialog;
+import helpers.PhotoDialog;
+import helpers.StatusDialog;
+import helpers.VideoDialog;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -55,9 +64,24 @@ public class ProfileActivity extends Activity
 			{
 				if(topPost instanceof Status)
 				{
-					new StatusDialog(getApplicationContext(), (Status) topPost).show();
+					new StatusDialog(ProfileActivity.this, (Status) topPost).show();
 				}
-				// TODO: display post preview dialog
+				else if(topPost instanceof Photo)
+				{
+					new PhotoDialog(ProfileActivity.this, (Photo) topPost).show();
+				}
+				else if(topPost instanceof Link)
+				{
+					new LinkDialog(ProfileActivity.this, (Link) topPost).show();
+				}
+				else if(topPost instanceof Checkin)
+				{
+					new CheckinDialog(ProfileActivity.this, (Checkin) topPost).show();
+				}
+				else if(topPost instanceof Video)
+				{
+					new VideoDialog(ProfileActivity.this, (Video) topPost).show();
+				}
 			}
 		});
 	}

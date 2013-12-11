@@ -1,4 +1,6 @@
-package com.death.likegraph;
+package helpers;
+
+import com.death.likegraph.R;
 
 import models.Status;
 import android.app.Dialog;
@@ -32,5 +34,4 @@ public class StatusDialog extends Dialog
 			}
 		});
 	}
-
 }
