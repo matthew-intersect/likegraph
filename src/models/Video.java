@@ -13,7 +13,7 @@ public class Video extends Post
 		this.name = name;
 		this.description = description;
 		this.source = source;
-		this.setPicture(thumbnail);
+		this.picture = thumbnail;
 	}
 
 	public String getName()
@@ -52,6 +52,20 @@ public class Video extends Post
 
 	public void setPicture(String picture) {
 		this.picture = picture;
+	}
+	
+	@Override
+	public String getListDisplay()
+	{
+		if(description.length() != 0)
+		{
+			return description;
+		}
+		else if(name.length() != 0)
+		{
+			return name;
+		}
+		return source;
 	}
 
 }

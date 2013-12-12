@@ -31,4 +31,14 @@ public class Photo extends Post
 	{
 		this.source = source;
 	}
+	
+	@Override
+	public String getListDisplay()
+	{
+		if(message.length() != 0)
+		{
+			return message;
+		}
+		return source;
+	}
 }

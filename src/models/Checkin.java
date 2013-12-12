@@ -32,4 +32,10 @@ public class Checkin extends Post
 		this.location = location;
 	}
 	
+	@Override
+	public String getListDisplay()
+	{
+		return message;
+	}
+	
 }

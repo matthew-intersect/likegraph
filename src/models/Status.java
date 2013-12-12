@@ -19,5 +19,11 @@ public class Status extends Post
 	{
 		this.status = status;
 	}
+	
+	@Override
+	public String getListDisplay()
+	{
+		return status;
+	}
 
 }

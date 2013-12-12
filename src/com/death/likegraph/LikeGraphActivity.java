@@ -3,7 +3,7 @@ package com.death.likegraph;
 import helpers.CheckinDialog;
 import helpers.LinkDialog;
 import helpers.PhotoDialog;
-import helpers.PostLikesComparator;
+import helpers.PostTimeComparator;
 import helpers.StatusDialog;
 import helpers.VideoDialog;
 
@@ -87,7 +87,7 @@ public class LikeGraphActivity extends Activity
 	    posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
 				checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
 				sharedPrefs.getBoolean("exclude_zero_photos", true));
-	    Collections.sort(posts, new PostLikesComparator());
+	    Collections.sort(posts, new PostTimeComparator());
 	    CategorySeries series = new CategorySeries("");
 		for(int i=0;i<posts.size();i++)
 		{
@@ -141,7 +141,7 @@ public class LikeGraphActivity extends Activity
 				posts = postsDatabaseAdapter.getPosts(checkStatii.isChecked(), checkLinks.isChecked(),
 						checkCheckins.isChecked(), checkPhotos.isChecked(), checkVideos.isChecked(), 
 						sharedPrefs.getBoolean("exclude_zero_photos", true));
-				Collections.sort(posts, new PostLikesComparator());
+				Collections.sort(posts, new PostTimeComparator());
 				CategorySeries series = new CategorySeries("");
 				for(int i=0;i<posts.size();i++)
 				{

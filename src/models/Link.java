@@ -31,5 +31,11 @@ public class Link extends Post
 	{
 		this.link = link;
 	}
+	
+	@Override
+	public String getListDisplay()
+	{
+		return message;
+	}
 
 }

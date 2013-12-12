@@ -42,4 +42,9 @@ public class Post
 	{
 		this.likeCount = likeCount;
 	}
+	
+	public String getListDisplay()
+	{
+		return String.valueOf(id);
+	}
 }

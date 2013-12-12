@@ -1,12 +1,23 @@
 package com.death.likegraph;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
+import helpers.CheckinDialog;
 import helpers.ImageLoader;
+import helpers.LinkDialog;
+import helpers.PhotoDialog;
+import helpers.PostTimeComparator;
 import helpers.StatusDialog;
+import helpers.VideoDialog;
+import models.Checkin;
 import models.Friend;
+import models.Link;
+import models.Photo;
+import models.Post;
 import models.Status;
-import adapters.StatusAdapter;
+import models.Video;
+import adapters.PostAdapter;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +29,7 @@ public class ViewFriendActivity extends ListActivity
 {
 	private PostsDatabaseAdapter postsDatabaseAdapter;
 	private Friend friend;
-	private ArrayList<Status> statuses;
+	private ArrayList<Post> posts;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -32,9 +43,10 @@ public class ViewFriendActivity extends ListActivity
 		Bundle extras = getIntent().getExtras();
 		long friendId = extras.getLong("friend_id");
 		friend = postsDatabaseAdapter.getFriend(friendId);
-		statuses = postsDatabaseAdapter.getLikedStatusesByFriend(friend.getId());
+		posts = postsDatabaseAdapter.getLikedPostsByFriend(friend.getId());
+		Collections.sort(posts, new PostTimeComparator());
 		
-		final StatusAdapter statusesAdapter = new StatusAdapter(getApplicationContext(), statuses);
+		final PostAdapter statusesAdapter = new PostAdapter(getApplicationContext(), posts);
 		setListAdapter(statusesAdapter);
 		
 		TextView name = (TextView) findViewById(R.id.friend_name);
@@ -48,6 +60,26 @@ public class ViewFriendActivity extends ListActivity
 	
 	public void onListItemClick(ListView l, View v, int pos, long id)
 	{
-		new StatusDialog(ViewFriendActivity.this, statuses.get(pos)).show();
+		Post post = posts.get(pos);
+		if(post instanceof Status)
+		{
+			new StatusDialog(ViewFriendActivity.this, (Status) post).show();
+		}
+		else if(post instanceof Photo)
+		{
+			new PhotoDialog(ViewFriendActivity.this, (Photo) post).show();
+		}
+		else if(post instanceof Link)
+		{
+			new LinkDialog(ViewFriendActivity.this, (Link) post).show();
+		}
+		else if(post instanceof Checkin)
+		{
+			new CheckinDialog(ViewFriendActivity.this, (Checkin) post).show();
+		}
+		else if(post instanceof Video)
+		{
+			new VideoDialog(ViewFriendActivity.this, (Video) post).show();
+		}
 	}
 }
