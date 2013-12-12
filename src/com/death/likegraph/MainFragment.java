@@ -33,6 +33,8 @@ public class MainFragment extends Fragment
 {
 	private UiLifecycleHelper uiHelper;
 	private PostsDatabaseAdapter postsDatabaseAdapter;
+	private SharedPreferences sharedPrefs;
+	
 	private static final String TAG = "MainFragment";
 	int offset = 0;
 	
@@ -58,6 +60,8 @@ public class MainFragment extends Fragment
 	    postsDatabaseAdapter = new PostsDatabaseAdapter(getActivity());
 	    postsDatabaseAdapter = postsDatabaseAdapter.open();
 	    
+	    sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+	    
 	    LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
 	    fetchData = (Button) view.findViewById(R.id.fetchData);
 	    createGraph = (Button) view.findViewById(R.id.createGraph);
@@ -76,6 +80,7 @@ public class MainFragment extends Fragment
 				dialog.setMessage("Fetching data...");
 		        dialog.show();
 		        postsDatabaseAdapter.clearTables();
+		        sharedPrefs.edit().putBoolean("data_fetched", false).commit();
 		        batchStatiiRequest();
 			}
 		});
@@ -186,10 +191,19 @@ public class MainFragment extends Fragment
 	    	rankFriends.setVisibility(View.VISIBLE);
 	    	searchFriends.setVisibility(View.VISIBLE);
 	    	profile.setVisibility(View.VISIBLE);
+	    	if(!sharedPrefs.getBoolean("data_fetched", false))
+	    	{
+	    		createGraph.setEnabled(false);
+	    		rankFriends.setEnabled(false);
+	    		searchFriends.setEnabled(false);
+	    		profile.setEnabled(false);
+	    	}
 	    }
 	    else if (state.isClosed())
 	    {
 	        Log.i(TAG, "Logged out...");
+	        postsDatabaseAdapter.clearTables();
+	        sharedPrefs.edit().putBoolean("data_fetched", false).commit();
 	        fetchData.setVisibility(View.GONE);
 	        createGraph.setVisibility(View.GONE);
 	        rankFriends.setVisibility(View.GONE);
@@ -455,7 +469,6 @@ public class MainFragment extends Fragment
     				long id = Long.parseLong(item.getString("uid"));
     				String name = item.getString("name");
     				String link = item.getString("pic_big");
-    				SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
     				sharedPrefs.edit().putLong("global_user_id", id).commit();
     				sharedPrefs.edit().putString("global_user_name", name).commit();
     				sharedPrefs.edit().putString("global_user_pic", link).commit();
@@ -466,6 +479,9 @@ public class MainFragment extends Fragment
     				e.printStackTrace();
     			}
     			dialog.dismiss();
+				sharedPrefs.edit().putBoolean("data_fetched", true).commit();
+				getActivity().finish();
+				startActivity(getActivity().getIntent());
             }
         });
         Request.executeBatchAsync(request);
