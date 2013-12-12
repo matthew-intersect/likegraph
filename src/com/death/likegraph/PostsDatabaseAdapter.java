@@ -489,6 +489,18 @@ public class PostsDatabaseAdapter
 		return count.getInt(count.getColumnIndex("count"));
 	}
 	
+	public Friend getTopFriend()
+	{
+		Cursor friendCursor = db.rawQuery("select friends.id,friends.name,friends.picture,count(likes.id) as count " +
+				"from friends left outer join likes on friends.name=likes.name group by friends.name order by count desc limit 1;", null);
+		friendCursor.moveToFirst();
+		long id = friendCursor.getLong(friendCursor.getColumnIndex("id"));
+		String name = friendCursor.getString(friendCursor.getColumnIndex("name"));
+		String picture = friendCursor.getString(friendCursor.getColumnIndex("picture"));
+		int count = friendCursor.getInt(friendCursor.getColumnIndex("count"));
+		return new Friend(id, name, picture, count);
+	}
+	
 	public Post getPostById(long id)
 	{
 		String postId = String.valueOf(id);

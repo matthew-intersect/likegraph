@@ -62,4 +62,14 @@
         android:layout_gravity="center"
         />
     
+    <TextView
+        android:id="@+id/top_liker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textIsSelectable="false"
+        android:layout_marginBottom="10dp"
+        android:textColor="#FFF"
+        android:layout_gravity="center"
+        />
+    
 </LinearLayout>
