@@ -359,13 +359,24 @@ public class PostsDatabaseAdapter
 		String picture = friend.getString(friend.getColumnIndex("picture"));
 		return new Friend(id, name, picture, 0);
 	}
+	
+	public ArrayList<Post> getLikedPostsByFriend(long friendId)
+	{
+		ArrayList<Post> posts = new ArrayList<Post>();
+		posts.addAll(getLikedStatusesByFriend(friendId));
+		posts.addAll(getLikedLinksByFriend(friendId));
+		posts.addAll(getLikedCheckinsByFriend(friendId));
+		posts.addAll(getLikedPhotosByFriend(friendId));
+		posts.addAll(getLikedVideosByFriend(friendId));
+		return posts;
+	}
 
 	public ArrayList<Status> getLikedStatusesByFriend(long friendId)
 	{
 		ArrayList<Status> statuses = new ArrayList<Status>();
 		Cursor statusCursor = db.rawQuery("select statii.id, statii.time, statii.status from statii " +
-				"left outer join likes on statii.id=likes.post_id inner join friends on likes.name=friends.name where friends.id=" + 
-				friendId + ";", null);
+				"left outer join likes on statii.id=likes.post_id inner join friends on likes.name=friends.name " +
+				"where friends.id=?;", new String[] {String.valueOf(friendId)});
 		while(statusCursor.moveToNext())
 		{
 			long id = statusCursor.getLong(statusCursor.getColumnIndex("id"));
@@ -374,6 +385,76 @@ public class PostsDatabaseAdapter
 			statuses.add(new Status(id, time, status, 0));
 		}
 		return statuses;
+	}
+	
+	public ArrayList<Link> getLikedLinksByFriend(long friendId)
+	{
+		ArrayList<Link> links = new ArrayList<Link>();
+		Cursor linkCursor = db.rawQuery("select links.id, links.time, links.message, links.link from links " +
+				"left outer join likes on links.id=likes.post_id inner join friends on likes.name=friends.name " +
+				"where friends.id=?;", new String[] {String.valueOf(friendId)});
+		while(linkCursor.moveToNext())
+		{
+			long id = linkCursor.getLong(linkCursor.getColumnIndex("id"));
+			long time = linkCursor.getLong(linkCursor.getColumnIndex("time"));
+			String message = linkCursor.getString(linkCursor.getColumnIndex("message"));
+			String link = linkCursor.getString(linkCursor.getColumnIndex("link"));
+			links.add(new Link(id, time, message, link, 0));
+		}
+		return links;
+	}
+	
+	public ArrayList<Checkin> getLikedCheckinsByFriend(long friendId)
+	{
+		ArrayList<Checkin> checkins = new ArrayList<Checkin>();
+		Cursor checkinCursor = db.rawQuery("select checkins.id, checkins.time, checkins.message, checkins.location from checkins " +
+				"left outer join likes on checkins.id=likes.post_id inner join friends on likes.name=friends.name " +
+				"where friends.id=?;", new String[] {String.valueOf(friendId)});
+		while(checkinCursor.moveToNext())
+		{
+			long id = checkinCursor.getLong(checkinCursor.getColumnIndex("id"));
+			long time = checkinCursor.getLong(checkinCursor.getColumnIndex("time"));
+			String message = checkinCursor.getString(checkinCursor.getColumnIndex("message"));
+			String location = checkinCursor.getString(checkinCursor.getColumnIndex("location"));
+			checkins.add(new Checkin(id, time, message, location, 0));
+		}
+		return checkins;
+	}
+	
+	public ArrayList<Photo> getLikedPhotosByFriend(long friendId)
+	{
+		ArrayList<Photo> photos = new ArrayList<Photo>();
+		Cursor photoCursor = db.rawQuery("select photos.id, photos.time, photos.message, photos.source from photos " +
+				"left outer join likes on photos.id=likes.post_id inner join friends on likes.name=friends.name " +
+				"where friends.id=?;", new String[] {String.valueOf(friendId)});
+		while(photoCursor.moveToNext())
+		{
+			long id = photoCursor.getLong(photoCursor.getColumnIndex("id"));
+			long time = photoCursor.getLong(photoCursor.getColumnIndex("time"));
+			String message = photoCursor.getString(photoCursor.getColumnIndex("message"));
+			String source = photoCursor.getString(photoCursor.getColumnIndex("source"));
+			photos.add(new Photo(id, time, message, source, 0));
+		}
+		return photos;
+	}
+	
+	public ArrayList<Video> getLikedVideosByFriend(long friendId)
+	{
+		ArrayList<Video> videos = new ArrayList<Video>();
+		Cursor videoCursor = db.rawQuery("select videos.id, videos.time, videos.name, videos.description, videos.source, " +
+				"videos.picture from videos left outer join likes on videos.id=likes.post_id inner join friends on " +
+				"likes.name=friends.name where friends.id=?;", new String[] {String.valueOf(friendId)});
+		while(videoCursor.moveToNext())
+		{
+			long id = videoCursor.getLong(videoCursor.getColumnIndex("id"));
+			long time = videoCursor.getLong(videoCursor.getColumnIndex("time"));
+			String name = videoCursor.getString(videoCursor.getColumnIndex("name"));
+			String description= videoCursor.getString(videoCursor.getColumnIndex("description"));
+			String source = videoCursor.getString(videoCursor.getColumnIndex("source"));
+			String picture = videoCursor.getString(videoCursor.getColumnIndex("picture"));
+			videos.add(new Video(id, time, name, description, source, picture, 0));
+		}
+		return videos;
 	}
 	
 	public int getTotalLikes()
